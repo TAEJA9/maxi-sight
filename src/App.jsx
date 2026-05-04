@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useCallback } from 'react';
-import { Layers, RefreshCw, Activity } from 'lucide-react';
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { Layers, RefreshCw, Activity, Sun, Moon, User } from 'lucide-react';
 
 // Raw data
 import portfolioData from '../portfolio.json';
@@ -30,57 +30,63 @@ const AVATAR_STYLES = {
   'MIO-USER-HYJ': 'from-emerald-400 to-cyan-500',
 };
 
-// Persona style tags
-const STYLE_TAGS = {
-  'MIO-USER-SYJ': ['고위험', '공격형', '성장주 집중'],
-  'MIO-USER-KJY': ['저위험', '안정형', '절세 전략가'],
-  'MIO-USER-HYJ': ['중위험', '미국주식 매니아', 'FAANG 집중'],
-};
+// Persona style tags are no longer hardcoded, we use portfolio.style from portfolio.json directly.
 
 /**
- * Persona Switcher Tab
+ * User Dropdown Menu
  */
-function PersonaTab({ persona, isActive, onClick }) {
-  const avatarGrad = AVATAR_STYLES[persona.portfolio_id];
-  const initial = persona.owner_name[0];
-  
+function UserDropdown({ personas, activeId, onSelect }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
-    <button
-      onClick={onClick}
-      className={`flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 text-left
-        ${isActive
-          ? 'bg-white/10 border border-white/15 shadow-lg'
-          : 'hover:bg-white/5 border border-transparent'
-        }`}
-    >
-      {/* Avatar */}
-      <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${avatarGrad} flex items-center justify-center
-        flex-shrink-0 text-white font-bold text-sm shadow-lg
-        ${isActive ? 'ring-2 ring-emerald-400 ring-offset-2 ring-offset-[#111118]' : ''}
-      `}>
-        {initial}
-      </div>
+    <div className="relative" ref={dropdownRef}>
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className="p-2 rounded-xl hover:bg-[var(--bg-card-hover)] text-[var(--text-muted)] hover:text-emerald-400 transition-all flex items-center gap-2"
+        title="계정 변경"
+      >
+        <User size={18} />
+      </button>
       
-      <div className="hidden sm:block">
-        <p className={`text-sm font-semibold leading-tight ${isActive ? 'text-white' : 'text-gray-400'}`}>
-          {persona.owner_name}
-        </p>
-        <p className="text-xs text-gray-600">{persona.age_group}</p>
-      </div>
-      
-      {isActive && (
-        <div className="ml-1 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse hidden sm:block" />
+      {isOpen && (
+        <div className="absolute right-0 top-full mt-2 w-48 bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl shadow-xl overflow-hidden z-50">
+          {personas.map(p => (
+            <button
+              key={p.portfolio_id}
+              onClick={() => {
+                onSelect(p.portfolio_id);
+                setIsOpen(false);
+              }}
+              className={`w-full text-left px-4 py-3 text-sm transition-colors hover:bg-[var(--bg-card-hover)]
+                ${activeId === p.portfolio_id ? 'text-emerald-500 font-bold bg-[var(--bg-secondary)]' : 'text-[var(--text-primary)]'}
+              `}
+            >
+              {p.owner_name} ({p.age_group})
+            </button>
+          ))}
+        </div>
       )}
-    </button>
+    </div>
   );
 }
 
 /**
  * Header component
  */
-function Header({ personas, activeId, onSelect, onRefresh }) {
+function Header({ personas, activeId, onSelect, onRefresh, isDark, toggleDark }) {
   return (
-    <header className="sticky top-0 z-30 bg-[#0a0a0f]/90 backdrop-blur-xl border-b border-white/5">
+    <header className="sticky top-0 z-30 bg-[var(--bg-primary)]/90 backdrop-blur-xl border-b border-[var(--border)] transition-colors">
       <div className="max-w-[1400px] mx-auto px-4 py-3">
         <div className="flex items-center justify-between gap-4">
           {/* Logo */}
@@ -88,33 +94,30 @@ function Header({ personas, activeId, onSelect, onRefresh }) {
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg">
               <Activity size={16} className="text-white" />
             </div>
-            <div className="hidden xs:block">
-              <span className="text-base font-bold gradient-text">Maxi-Sight</span>
-              <span className="text-xs text-gray-600 ml-1.5 hidden sm:inline">by MaxItOut</span>
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-lg font-bold gradient-text tracking-tight">Maxi-Sight</span>
+              <span className="text-xs text-[var(--text-muted)] hidden sm:inline">by MaxItOut</span>
             </div>
           </div>
           
-          {/* Persona Switcher */}
-          <nav className="flex items-center gap-1">
-            {personas.map(p => (
-              <PersonaTab
-                key={p.portfolio_id}
-                persona={p}
-                isActive={p.portfolio_id === activeId}
-                onClick={() => onSelect(p.portfolio_id)}
-              />
-            ))}
-          </nav>
-          
           {/* Actions */}
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            <button
+              onClick={toggleDark}
+              className="p-2 rounded-xl hover:bg-[var(--bg-card-hover)] text-[var(--text-muted)] hover:text-emerald-400 transition-all"
+              title="테마 변경"
+            >
+              {isDark ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
             <button
               onClick={onRefresh}
-              className="p-2 rounded-xl hover:bg-white/8 text-gray-500 hover:text-emerald-400 transition-all"
+              className="p-2 rounded-xl hover:bg-[var(--bg-card-hover)] text-[var(--text-muted)] hover:text-emerald-400 transition-all"
               title="데이터 새로고침"
             >
-              <RefreshCw size={15} />
+              <RefreshCw size={18} />
             </button>
+            <div className="w-px h-4 bg-[var(--border)] mx-2" />
+            <UserDropdown personas={personas} activeId={activeId} onSelect={onSelect} />
           </div>
         </div>
       </div>
@@ -126,39 +129,42 @@ function Header({ personas, activeId, onSelect, onRefresh }) {
  * Persona Info Bar
  */
 function PersonaInfoBar({ portfolio, metrics }) {
-  const avatarGrad = AVATAR_STYLES[portfolio.portfolio_id];
-  const tags = STYLE_TAGS[portfolio.portfolio_id] ?? [];
+  const avatarGrad = AVATAR_STYLES[portfolio.portfolio_id] || 'from-gray-400 to-gray-600';
+  
+  const returnColor = metrics.total_return_pct >= 0 ? 'text-red-500' : 'text-blue-500';
+  const returnSign = metrics.total_return_pct > 0 ? '+' : '';
   
   return (
-    <div className="flex flex-wrap items-center gap-3 mb-6 animate-fade-in">
-      <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${avatarGrad} flex items-center justify-center text-white font-bold text-lg shadow-xl`}>
-        {portfolio.owner_name[0]}
-      </div>
+    <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 animate-fade-in">
+      {/* Primary: Return Rate */}
       <div>
-        <div className="flex items-center gap-2">
-          <h1 className="text-xl font-bold text-white">{portfolio.owner_name}</h1>
-          <span className="text-sm text-gray-500">{portfolio.age_group}</span>
-        </div>
-        <div className="flex flex-wrap gap-1.5 mt-1">
-          {tags.map(tag => (
-            <span key={tag} className="badge-emerald text-xs">{tag}</span>
-          ))}
+        <h2 className="text-sm font-medium text-[var(--text-muted)] mb-1">내 포트폴리오 총 수익률</h2>
+        <div className="flex items-baseline gap-2">
+          <span className={`text-5xl md:text-6xl font-extrabold tracking-tighter ${returnColor}`}>
+            {returnSign}{metrics.total_return_pct.toFixed(2)}%
+          </span>
+          {metrics.flags?.length > 0 && (
+            <span className="badge-yellow text-xs transform -translate-y-2">
+              ⚠ {metrics.flags.length}개 경고
+            </span>
+          )}
         </div>
       </div>
       
-      <div className="ml-auto flex items-center gap-2">
-        <div className="text-right hidden sm:block">
-          <p className="text-xs text-gray-500">총 수익률</p>
-          <p className={`text-base font-bold ${metrics.total_return_pct >= 0 ? 'text-red-400' : 'text-blue-400'}`}>
-            {metrics.total_return_pct >= 0 ? '+' : ''}{metrics.total_return_pct.toFixed(2)}%
-          </p>
+      {/* Secondary: Persona Info */}
+      <div className="flex items-center gap-3 bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl p-3 shadow-sm">
+        <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${avatarGrad} flex items-center justify-center text-white font-bold text-lg shadow-inner`}>
+          {portfolio.owner_name[0]}
         </div>
-        
-        {metrics.flags?.length > 0 && (
-          <div className="badge-yellow text-xs">
-            ⚠ {metrics.flags.length}개 경고
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="text-base font-bold text-[var(--text-primary)] leading-tight">{portfolio.owner_name}</span>
+            <span className="text-xs text-[var(--text-muted)]">{portfolio.age_group}</span>
           </div>
-        )}
+          <div className="mt-0.5">
+            <span className="text-xs font-medium text-emerald-500">{portfolio.style}</span>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -171,6 +177,22 @@ export default function App() {
   const portfolios = portfolioData.portfolios;
   const [activeId, setActiveId] = useState(portfolios[0].portfolio_id);
   const [refreshKey, setRefreshKey] = useState(0);
+
+  // Theme logic
+  const [isDark, setIsDark] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return true;
+  });
+
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.remove('light-mode');
+    } else {
+      document.documentElement.classList.add('light-mode');
+    }
+  }, [isDark]);
   
   // Find active portfolio raw data
   const activeRaw = useMemo(
@@ -207,13 +229,15 @@ export default function App() {
   }, []);
   
   return (
-    <div className="min-h-screen bg-[#0a0a0f]">
+    <div className="min-h-screen bg-[var(--bg-primary)] transition-colors">
       {/* Header with persona switcher */}
       <Header
         personas={portfolios}
         activeId={activeId}
         onSelect={setActiveId}
         onRefresh={handleRefresh}
+        isDark={isDark}
+        toggleDark={() => setIsDark(!isDark)}
       />
       
       {/* Main content */}
@@ -222,29 +246,25 @@ export default function App() {
         <PersonaInfoBar portfolio={normalized} metrics={metrics} />
         
         {/* Dashboard Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-5">
-          {/* Left column: V1 Balance Hub */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-5">
+          {/* Main Left: V1 + V4 */}
           <div className="space-y-5">
+            <V2KPICards metrics={metrics} />
+            
             <V1BalanceHub
               metrics={metrics}
               normalizedPortfolio={normalized}
               accountGroups={accountGroups}
             />
             
-            {/* V3 on left below V1 on desktop */}
-            <V3AllocationChart metrics={metrics} />
-            
-            {/* V5 Insight Feed on left on desktop */}
-            <V5InsightFeed insights={insights} />
+            <V4Timeline metrics={metrics} />
           </div>
           
-          {/* Right column: V2 + V4 */}
+          {/* Main Right: V5 + V3 */}
           <div className="space-y-5">
-            {/* V2 KPI Cards */}
-            <V2KPICards metrics={metrics} />
+            <V5InsightFeed insights={insights} />
             
-            {/* V4 Timeline */}
-            <V4Timeline metrics={metrics} />
+            <V3AllocationChart metrics={metrics} />
           </div>
         </div>
         

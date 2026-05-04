@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, ReferenceLine, BarChart, Bar, Cell,
+  ResponsiveContainer, ReferenceLine,
 } from 'recharts';
 import { SectionHeader, PeriodSelector } from './shared.jsx';
 import { formatKRW, formatPct } from '../modules/moduleA.js';
@@ -26,20 +26,7 @@ function ChartTooltip({ active, payload, label }) {
   );
 }
 
-function ContributionTooltip({ active, payload, label }) {
-  if (!active || !payload?.length) return null;
-  const d = payload[0]?.payload;
-  return (
-    <div className="custom-tooltip">
-      <p className="text-sm font-semibold text-white">{d?.name}</p>
-      <p className="text-xs text-gray-400">{d?.ticker}</p>
-      <p className={`text-sm font-bold mt-1 ${d?.return_pct >= 0 ? 'text-red-400' : 'text-blue-400'}`}>
-        {d?.return_pct >= 0 ? '+' : ''}{d?.return_pct?.toFixed(2)}%
-      </p>
-      <p className="text-xs text-gray-500">{formatKRW(d?.gain_krw)}</p>
-    </div>
-  );
-}
+
 
 /**
  * V4 — 수익률 타임라인 (Skills-C §V4)
@@ -151,47 +138,43 @@ export function V4Timeline({ metrics }) {
         </ResponsiveContainer>
       </div>
       
-      {/* Holdings Contribution Bar Chart */}
-      <div className="glass-card p-6 animate-fade-in-up">
+      {/* Holdings Contribution List */}
+      <div className="glass-card p-5 animate-fade-in-up">
         <SectionHeader
           title="종목별 수익 기여도"
           subtitle="취득단가 대비 수익률 순"
         />
         
-        <ResponsiveContainer width="100%" height={Math.max(160, topHoldings.length * 36)}>
-          <BarChart
-            data={topHoldings}
-            layout="vertical"
-            margin={{ top: 0, right: 60, bottom: 0, left: 0 }}
-          >
-            <XAxis
-              type="number"
-              tick={{ fill: '#555', fontSize: 10 }}
-              tickFormatter={v => `${v >= 0 ? '+' : ''}${v.toFixed(0)}%`}
-              axisLine={false}
-              tickLine={false}
-            />
-            <YAxis
-              type="category"
-              dataKey="name"
-              tick={{ fill: '#aaa', fontSize: 11 }}
-              axisLine={false}
-              tickLine={false}
-              width={80}
-            />
-            <Tooltip content={<ContributionTooltip />} />
-            <ReferenceLine x={0} stroke="rgba(255,255,255,0.1)" />
-            <Bar dataKey="return_pct" radius={[0, 4, 4, 0]} maxBarSize={20}>
-              {topHoldings.map((h, idx) => (
-                <Cell
-                  key={h.id}
-                  fill={h.return_pct >= 0 ? '#ef4444' : '#3b82f6'}
-                  fillOpacity={0.8}
-                />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+        <div className="mt-3 flex flex-col gap-1.5">
+          {topHoldings.map((h, idx) => {
+            const isPositive = h.return_pct >= 0;
+            const colorClass = isPositive ? 'text-red-500' : 'text-blue-500';
+            const sign = isPositive ? '+' : '';
+            
+            return (
+              <div key={h.id} className="flex items-center justify-between p-2.5 rounded-xl hover:bg-[var(--bg-card-hover)] transition-colors border border-transparent hover:border-[var(--border)]">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-[var(--bg-secondary)] flex items-center justify-center text-xs font-bold text-[var(--text-muted)]">
+                    {idx + 1}
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-[var(--text-primary)] leading-tight">{h.name}</p>
+                    <p className="text-[11px] text-[var(--text-muted)] mt-0.5">{h.ticker}</p>
+                  </div>
+                </div>
+                
+                <div className="text-right">
+                  <p className={`text-base font-bold ${colorClass} tracking-tight leading-tight`}>
+                    {sign}{h.return_pct?.toFixed(2)}%
+                  </p>
+                  <p className="text-[11px] text-[var(--text-muted)] mt-0.5">
+                    {formatKRW(h.gain_krw)}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

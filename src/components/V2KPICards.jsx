@@ -10,7 +10,7 @@ import {
  */
 function KPICard({ title, value, unit, colorClass, translation, guideKey, subtitle }) {
   return (
-    <div className="glass-card p-5 flex flex-col gap-2 hover:border-white/15 transition-all animate-fade-in-up">
+    <div className="glass-card p-4 flex flex-col gap-1.5 hover:border-white/15 transition-all animate-fade-in-up">
       {/* Title + EasyGuide */}
       <div className="flex items-center gap-1.5">
         <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{title}</span>
@@ -23,11 +23,11 @@ function KPICard({ title, value, unit, colorClass, translation, guideKey, subtit
       
       {/* Main value */}
       <div className="flex items-baseline gap-1 my-1">
-        <span className={`text-3xl font-bold tracking-tight ${colorClass}`}>
+        <span className={`text-2xl font-bold tracking-tight ${colorClass}`}>
           {value ?? '—'}
         </span>
         {unit && value != null && (
-          <span className={`text-lg font-medium ${colorClass} opacity-70`}>{unit}</span>
+          <span className={`text-base font-medium ${colorClass} opacity-70`}>{unit}</span>
         )}
       </div>
       
@@ -113,13 +113,13 @@ export function V2KPICards({ metrics }) {
 
 function SecondaryKPI({ label, guideKey, value, sub }) {
   return (
-    <div className="glass-card p-4">
-      <div className="flex items-center gap-1 mb-1">
+    <div className="glass-card p-3.5 flex flex-col gap-0.5 justify-center">
+      <div className="flex items-center gap-1 mb-0.5">
         <span className="text-xs text-gray-500 font-medium">{label}</span>
         <EasyGuide term={guideKey} />
       </div>
-      <p className="text-xl font-bold text-white">{value}</p>
-      <p className="text-xs text-gray-600 mt-1">{sub}</p>
+      <p className="text-lg font-bold text-[var(--text-primary)] leading-none">{value}</p>
+      <p className="text-[11px] text-[var(--text-muted)] mt-1">{sub}</p>
     </div>
   );
 }

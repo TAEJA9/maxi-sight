@@ -17,9 +17,22 @@
   --text-primary: #f0f0f5;
   --text-secondary: #8888aa;
   --text-muted: #555566;
-  --radius: 1.25rem;
-  --radius-lg: 1.75rem;
+  --radius: 1rem;
+  --radius-lg: 1.25rem;
   --shadow-card: 0 4px 32px rgba(0, 0, 0, 0.4), 0 1px 0 rgba(255,255,255,0.04) inset;
+}
+
+.light-mode {
+  --bg-primary: #f4f5f8;
+  --bg-secondary: #e9eaef;
+  --bg-card: #ffffff;
+  --bg-card-hover: #fcfcfd;
+  --border: rgba(0, 0, 0, 0.08);
+  --border-hover: rgba(0, 0, 0, 0.15);
+  --text-primary: #1a1a24;
+  --text-secondary: #555566;
+  --text-muted: #8888aa;
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.04), 0 1px 0 rgba(0,0,0,0.02) inset;
 }
 
 * {
