@@ -1,0 +1,191 @@
+{
+    "portfolios": [
+        {
+            "portfolio_id": "MIO-USER-SYJ",
+            "owner_name": "송유진",
+            "age_group": "20대 후반",
+            "style": "공격적 (High-Risk)",
+            "exchange_rate_usd_krw": 1350,
+            "generated_at": "2026-05-04T10:00:00Z",
+            "holdings": [
+                {
+                    "id": "syj-001",
+                    "ticker": "TSLA",
+                    "name": "테슬라",
+                    "asset_class": "EQ",
+                    "account_type": "04",
+                    "qty": 30,
+                    "cost_krw": 280000,
+                    "current_krw": 320000,
+                    "currency": "USD",
+                    "tax_deferred": false
+                },
+                {
+                    "id": "syj-002",
+                    "ticker": "TQQQ",
+                    "name": "ProShares QQQ 3x Leverage",
+                    "asset_class": "ET",
+                    "account_type": "04",
+                    "qty": 100,
+                    "cost_krw": 85000,
+                    "current_krw": 110000,
+                    "currency": "USD",
+                    "tax_deferred": false
+                },
+                {
+                    "id": "syj-003",
+                    "ticker": "SOL",
+                    "name": "Solana",
+                    "asset_class": "CR",
+                    "account_type": "07",
+                    "qty": 50,
+                    "cost_krw": 180000,
+                    "current_krw": 240000,
+                    "currency": "USD",
+                    "coin_symbol": "SOL",
+                    "exchange_name": "Binance"
+                },
+                {
+                    "id": "syj-004",
+                    "ticker": "305540",
+                    "name": "TIGER 2차전지테마",
+                    "asset_class": "ET",
+                    "account_type": "03",
+                    "qty": 200,
+                    "cost_krw": 25000,
+                    "current_krw": 19000,
+                    "currency": "KRW",
+                    "tax_deferred": false
+                }
+            ]
+        },
+        {
+            "portfolio_id": "MIO-USER-KJY",
+            "owner_name": "김정연",
+            "age_group": "30대 중반",
+            "style": "안정적 (Safety-First)",
+            "exchange_rate_usd_krw": 1350,
+            "generated_at": "2026-05-04T10:00:00Z",
+            "holdings": [
+                {
+                    "id": "kjy-001",
+                    "ticker": "005930",
+                    "name": "삼성전자",
+                    "asset_class": "EQ",
+                    "account_type": "01",
+                    "qty": 150,
+                    "cost_krw": 71000,
+                    "current_krw": 78000,
+                    "currency": "KRW",
+                    "tax_deferred": true
+                },
+                {
+                    "id": "kjy-002",
+                    "ticker": "SCHD",
+                    "name": "Schwab US Dividend Equity ETF",
+                    "asset_class": "ET",
+                    "account_type": "01",
+                    "qty": 80,
+                    "cost_krw": 105000,
+                    "current_krw": 115000,
+                    "currency": "USD",
+                    "tax_deferred": true
+                },
+                {
+                    "id": "kjy-003",
+                    "ticker": "408530",
+                    "name": "KODEX 미국채10년선물",
+                    "asset_class": "BD",
+                    "account_type": "02",
+                    "qty": 300,
+                    "cost_krw": 11000,
+                    "current_krw": 11200,
+                    "currency": "KRW",
+                    "tax_deferred": true
+                },
+                {
+                    "id": "kjy-004",
+                    "ticker": "KORAU",
+                    "name": "KRX 금현물",
+                    "asset_class": "AL",
+                    "account_type": "03",
+                    "qty": 100,
+                    "cost_krw": 85000,
+                    "current_krw": 115000,
+                    "currency": "KRW",
+                    "tax_deferred": false
+                },
+                {
+                    "id": "kjy-005",
+                    "ticker": "CMA_01",
+                    "name": "미래에셋 CMA-RP",
+                    "asset_class": "CS",
+                    "account_type": "06",
+                    "qty": 1,
+                    "cost_krw": 15000000,
+                    "current_krw": 15250000,
+                    "currency": "KRW",
+                    "tax_deferred": false
+                }
+            ]
+        },
+        {
+            "portfolio_id": "MIO-USER-HYJ",
+            "owner_name": "한예지",
+            "age_group": "20대 후반",
+            "style": "미국주식 매니아 (US Stock Enthusiast)",
+            "exchange_rate_usd_krw": 1350,
+            "generated_at": "2026-05-04T10:00:00Z",
+            "holdings": [
+                {
+                    "id": "hyj-001",
+                    "ticker": "NVDA",
+                    "name": "NVIDIA",
+                    "asset_class": "EQ",
+                    "account_type": "04",
+                    "qty": 40,
+                    "cost_krw": 450000,
+                    "current_krw": 1250000,
+                    "currency": "USD",
+                    "tax_deferred": false
+                },
+                {
+                    "id": "hyj-002",
+                    "ticker": "AAPL",
+                    "name": "Apple",
+                    "asset_class": "EQ",
+                    "account_type": "04",
+                    "qty": 50,
+                    "cost_krw": 210000,
+                    "current_krw": 255000,
+                    "currency": "USD",
+                    "tax_deferred": false
+                },
+                {
+                    "id": "hyj-003",
+                    "ticker": "MSFT",
+                    "name": "Microsoft",
+                    "asset_class": "EQ",
+                    "account_type": "04",
+                    "qty": 20,
+                    "cost_krw": 380000,
+                    "current_krw": 580000,
+                    "currency": "USD",
+                    "tax_deferred": false
+                },
+                {
+                    "id": "hyj-004",
+                    "ticker": "VOO",
+                    "name": "Vanguard S&P 500 ETF",
+                    "asset_class": "ET",
+                    "account_type": "04",
+                    "qty": 30,
+                    "cost_krw": 550000,
+                    "current_krw": 720000,
+                    "currency": "USD",
+                    "tax_deferred": false
+                }
+            ]
+        }
+    ]
+}
