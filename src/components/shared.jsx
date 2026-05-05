@@ -31,7 +31,7 @@ export function EasyGuide({ term, className = '' }) {
       onMouseLeave={() => setVisible(false)}
       onClick={() => setVisible(v => !v)}
     >
-      <HelpCircle size={13} className="text-gray-500 hover:text-emerald-400 transition-colors" />
+      <HelpCircle size={13} className="text-[var(--text-muted)] hover:text-emerald-400 transition-colors" />
       
       {visible && (
         <div className="easy-guide-popup bottom-full left-0 mb-2 w-64">
@@ -41,9 +41,9 @@ export function EasyGuide({ term, className = '' }) {
               <span className="badge-emerald text-xs">{guide.alias}</span>
             )}
           </div>
-          <p className="text-xs text-gray-200 leading-relaxed">{guide.desc}</p>
+          <p className="text-xs text-[var(--text-primary)] leading-relaxed">{guide.desc}</p>
           {guide.sub && (
-            <p className="text-xs text-gray-500 mt-1 leading-relaxed">{guide.sub}</p>
+            <p className="text-xs text-[var(--text-muted)] mt-1 leading-relaxed">{guide.sub}</p>
           )}
         </div>
       )}
@@ -91,8 +91,8 @@ export function SectionHeader({ title, subtitle, children }) {
   return (
     <div className="flex items-center justify-between mb-4">
       <div>
-        <h2 className="text-base font-semibold text-white">{title}</h2>
-        {subtitle && <p className="text-xs text-gray-500 mt-0.5">{subtitle}</p>}
+        <h2 className="text-base font-semibold text-[var(--text-primary)]">{title}</h2>
+        {subtitle && <p className="text-xs text-[var(--text-muted)] mt-0.5">{subtitle}</p>}
       </div>
       {children}
     </div>
@@ -104,7 +104,7 @@ export function SectionHeader({ title, subtitle, children }) {
  */
 export function PeriodSelector({ periods, active, onChange }) {
   return (
-    <div className="flex gap-1 bg-white/5 rounded-full p-1">
+    <div className="flex gap-1 bg-[var(--border)] rounded-full p-1">
       {periods.map(p => (
         <button
           key={p}
@@ -124,10 +124,10 @@ export function PeriodSelector({ periods, active, onChange }) {
 export function AccountBadge({ code, label, taxDeferred }) {
   return (
     <div className="flex items-center gap-1.5">
-      <span className="text-xs font-mono text-gray-500 bg-white/5 px-1.5 py-0.5 rounded">
+      <span className="text-xs font-mono text-[var(--text-muted)] bg-[var(--border)] px-1.5 py-0.5 rounded">
         {code}
       </span>
-      <span className="text-sm font-medium text-gray-200">{label}</span>
+      <span className="text-sm font-medium text-[var(--text-primary)]">{label}</span>
       {taxDeferred && (
         <span className="text-xs text-indigo-400 bg-indigo-400/10 px-1.5 py-0.5 rounded-full border border-indigo-400/20">
           🔒 과세이연

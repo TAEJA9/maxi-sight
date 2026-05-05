@@ -21,6 +21,7 @@ const HOLDING_YEARS = {
   'MIO-USER-SYJ': 1.5,  // 송유진: 1.5 years aggressive
   'MIO-USER-KJY': 3.0,  // 김정연: 3 years stable
   'MIO-USER-HYJ': 2.0,  // 한예지: 2 years US stocks
+  'MIO-USER-PMS': 1.0,  // 박민수: 1 year small-cap
 };
 
 // Persona avatar styles
@@ -28,6 +29,7 @@ const AVATAR_STYLES = {
   'MIO-USER-SYJ': 'from-orange-400 to-red-500',
   'MIO-USER-KJY': 'from-blue-400 to-indigo-600',
   'MIO-USER-HYJ': 'from-emerald-400 to-cyan-500',
+  'MIO-USER-PMS': 'from-purple-400 to-pink-500',
 };
 
 // Persona style tags are no longer hardcoded, we use portfolio.style from portfolio.json directly.
@@ -84,7 +86,7 @@ function UserDropdown({ personas, activeId, onSelect }) {
 /**
  * Header component
  */
-function Header({ personas, activeId, onSelect, onRefresh, isDark, toggleDark }) {
+function Header({ personas, activeId, onSelect, onRefresh, isDark, toggleDark, isRefreshing }) {
   return (
     <header className="sticky top-0 z-30 bg-[var(--bg-primary)]/90 backdrop-blur-xl border-b border-[var(--border)] transition-colors">
       <div className="max-w-[1400px] mx-auto px-4 py-3">
@@ -111,10 +113,11 @@ function Header({ personas, activeId, onSelect, onRefresh, isDark, toggleDark })
             </button>
             <button
               onClick={onRefresh}
-              className="p-2 rounded-xl hover:bg-[var(--bg-card-hover)] text-[var(--text-muted)] hover:text-emerald-400 transition-all"
+              className="p-2 rounded-xl hover:bg-[var(--bg-card-hover)] text-[var(--text-muted)] hover:text-emerald-400 transition-all disabled:opacity-50"
               title="데이터 새로고침"
+              disabled={isRefreshing}
             >
-              <RefreshCw size={18} />
+              <RefreshCw size={18} className={isRefreshing ? "animate-spin text-emerald-400" : ""} />
             </button>
             <div className="w-px h-4 bg-[var(--border)] mx-2" />
             <UserDropdown personas={personas} activeId={activeId} onSelect={onSelect} />
@@ -177,6 +180,8 @@ export default function App() {
   const portfolios = portfolioData.portfolios;
   const [activeId, setActiveId] = useState(portfolios[0].portfolio_id);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lastRefreshed, setLastRefreshed] = useState(null);
 
   // Theme logic
   const [isDark, setIsDark] = useState(() => {
@@ -225,8 +230,18 @@ export default function App() {
   );
   
   const handleRefresh = useCallback(() => {
-    setRefreshKey(k => k + 1);
-  }, []);
+    if (isRefreshing) return;
+    setIsRefreshing(true);
+    
+    // Simulate network latency (0.8s ~ 1.5s)
+    const delay = Math.floor(Math.random() * 700) + 800;
+    
+    setTimeout(() => {
+      setRefreshKey(k => k + 1);
+      setLastRefreshed(new Date().toISOString());
+      setIsRefreshing(false);
+    }, delay);
+  }, [isRefreshing]);
   
   return (
     <div className="min-h-screen bg-[var(--bg-primary)] transition-colors">
@@ -238,6 +253,7 @@ export default function App() {
         onRefresh={handleRefresh}
         isDark={isDark}
         toggleDark={() => setIsDark(!isDark)}
+        isRefreshing={isRefreshing}
       />
       
       {/* Main content */}
@@ -249,13 +265,13 @@ export default function App() {
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-5">
           {/* Main Left: V1 + V4 */}
           <div className="space-y-5">
-            <V2KPICards metrics={metrics} />
-            
             <V1BalanceHub
               metrics={metrics}
               normalizedPortfolio={normalized}
               accountGroups={accountGroups}
             />
+            
+            <V2KPICards metrics={metrics} />
             
             <V4Timeline metrics={metrics} />
           </div>
@@ -270,11 +286,13 @@ export default function App() {
         
         {/* Footer */}
         <footer className="mt-12 pb-6 text-center">
-          <p className="text-xs text-gray-700">
-            Maxi-Sight · MaxItOut Team · 데이터 기준: {new Date(normalized.generated_at).toLocaleDateString('ko-KR')} ·
+          <p className="text-xs text-[var(--text-muted)]">
+            Maxi-Sight · MaxItOut Team · 데이터 기준: {new Date(lastRefreshed || normalized.generated_at).toLocaleString('ko-KR', {
+              year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit'
+            })} ·
             환율 ₩{normalized.exchange_rate_usd_krw.toLocaleString()}/USD
           </p>
-          <p className="text-xs text-gray-800 mt-1">
+          <p className="text-xs text-[var(--text-muted)] mt-1">
             본 서비스는 투자 정보 제공 목적이며, 투자 권유가 아닙니다.
           </p>
         </footer>

@@ -12,11 +12,11 @@ function ChartTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   return (
     <div className="custom-tooltip">
-      <p className="text-xs text-gray-500 mb-2">{label}</p>
+      <p className="text-xs text-[var(--text-muted)] mb-2">{label}</p>
       {payload.map(p => (
         <div key={p.dataKey} className="flex items-center gap-2 text-xs">
           <div className="w-2 h-2 rounded-full" style={{ background: p.color }} />
-          <span className="text-gray-400">{p.name}</span>
+          <span className="text-[var(--text-muted)]">{p.name}</span>
           <span className="font-semibold ml-auto" style={{ color: p.color }}>
             {p.value >= 0 ? '+' : ''}{p.value?.toFixed(2)}%
           </span>
@@ -69,7 +69,7 @@ export function V4Timeline({ metrics }) {
             <div className="flex items-center gap-4 text-xs mt-1">
               <span className="flex items-center gap-1.5">
                 <span className="w-4 h-0.5 bg-emerald-400 inline-block rounded" />
-                <span className="text-gray-400">내 포트폴리오</span>
+                <span className="text-[var(--text-muted)]">내 포트폴리오</span>
                 {latestData && (
                   <span className={`font-bold ${latestData.portfolio >= 0 ? 'text-red-400' : 'text-blue-400'}`}>
                     {latestData.portfolio >= 0 ? '+' : ''}{latestData.portfolio.toFixed(2)}%
@@ -78,11 +78,11 @@ export function V4Timeline({ metrics }) {
               </span>
               <span className="flex items-center gap-1.5">
                 <span className="w-4 h-px bg-gray-500 inline-block border-dashed border-t border-gray-500" />
-                <span className="text-gray-600">KOSPI</span>
+                <span className="text-[var(--text-muted)]">KOSPI</span>
               </span>
               <span className="flex items-center gap-1.5">
                 <span className="w-4 h-px bg-blue-700 inline-block" />
-                <span className="text-gray-600">S&P 500</span>
+                <span className="text-[var(--text-muted)]">S&P 500</span>
               </span>
             </div>
           </div>

@@ -186,6 +186,53 @@
                     "tax_deferred": false
                 }
             ]
+        },
+        {
+            "portfolio_id": "MIO-USER-PMS",
+            "owner_name": "박민수",
+            "age_group": "20대 초반",
+            "style": "소액 적립식 (Small-Cap Saver)",
+            "exchange_rate_usd_krw": 1350,
+            "generated_at": "2026-05-04T10:00:00Z",
+            "holdings": [
+                {
+                    "id": "pms-001",
+                    "ticker": "CMA_02",
+                    "name": "토스뱅크 파킹통장",
+                    "asset_class": "CS",
+                    "account_type": "06",
+                    "qty": 1,
+                    "cost_krw": 1200000,
+                    "current_krw": 1215000,
+                    "currency": "KRW",
+                    "tax_deferred": false
+                },
+                {
+                    "id": "pms-002",
+                    "ticker": "SUB_01",
+                    "name": "주택청약종합저축",
+                    "asset_class": "SV",
+                    "account_type": "01",
+                    "qty": 1,
+                    "cost_krw": 2400000,
+                    "current_krw": 2450000,
+                    "currency": "KRW",
+                    "sub_type": "SUBSCRIPTION",
+                    "tax_deferred": false
+                },
+                {
+                    "id": "pms-003",
+                    "ticker": "458730",
+                    "name": "TIGER 미국배당다우존스",
+                    "asset_class": "ET",
+                    "account_type": "01",
+                    "qty": 150,
+                    "cost_krw": 9800,
+                    "current_krw": 10500,
+                    "currency": "KRW",
+                    "tax_deferred": true
+                }
+            ]
         }
     ]
 }

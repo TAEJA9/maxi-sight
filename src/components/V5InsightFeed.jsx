@@ -27,7 +27,7 @@ function InsightCard({ insight, delay = 0 }) {
           <span className="text-lg leading-none">{insight.icon}</span>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-sm font-semibold text-white">{insight.title}</span>
+              <span className="text-sm font-semibold text-[var(--text-primary)]">{insight.title}</span>
               <span className={`text-xs font-medium px-1.5 py-0.5 rounded-full ${priority.cls}`}>
                 {priority.label}
               </span>
@@ -38,12 +38,12 @@ function InsightCard({ insight, delay = 0 }) {
       </div>
       
       {/* Body */}
-      <p className="text-sm text-gray-300 leading-relaxed pl-7">{insight.body}</p>
+      <p className="text-sm text-[var(--text-primary)] leading-relaxed pl-7">{insight.body}</p>
       
       {/* Footer */}
       <div className="flex items-center gap-1.5 mt-3 pl-7">
-        <Zap size={10} className="text-gray-600" />
-        <span className="text-xs text-gray-600">
+        <Zap size={10} className="text-[var(--text-muted)]" />
+        <span className="text-xs text-[var(--text-muted)]">
           {formatInsightTime(insight.generated_at)} · {insight.source}
         </span>
       </div>
@@ -61,7 +61,7 @@ export function V5InsightFeed({ insights }) {
         <SectionHeader title="AI 인사이트 피드" />
         <div className="text-center py-8">
           <div className="text-4xl mb-3">👍</div>
-          <p className="text-gray-400 text-sm">현재 특이 신호가 없어요. 안정적으로 유지되고 있어요</p>
+          <p className="text-[var(--text-muted)] text-sm">현재 특이 신호가 없어요. 안정적으로 유지되고 있어요</p>
         </div>
       </div>
     );

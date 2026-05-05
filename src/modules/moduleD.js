@@ -254,6 +254,6 @@ export function generateInsights(metrics, normalizedPortfolio) {
   return insights.map((ins, i) => ({
     ...ins,
     generated_at: new Date(Date.now() - i * 60000 * 15).toISOString(),
-    source: 'Maxi-Sight AI 분석',
+    source: 'Gemini AI',
   }));
 }

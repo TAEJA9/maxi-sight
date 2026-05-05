@@ -29,12 +29,12 @@ export function V1BalanceHub({ metrics, normalizedPortfolio, accountGroups }) {
     <div className="glass-card p-6 animate-fade-in-up">
       {/* Total Value Header */}
       <div className="mb-6">
-        <p className="text-xs font-medium text-gray-500 mb-1 tracking-wider uppercase">총 자산</p>
+        <p className="text-xs font-medium text-[var(--text-muted)] mb-1 tracking-wider uppercase">총 자산</p>
         <div className="flex items-end gap-3 flex-wrap">
-          <span className="text-4xl font-bold text-white tracking-tight">
+          <span className="text-4xl font-bold text-[var(--text-primary)] tracking-tight">
             {formatKRW(totalValue)}
           </span>
-          <span className="text-lg text-gray-500 mb-0.5">
+          <span className="text-lg text-[var(--text-muted)] mb-0.5">
             {formatUSD(totalValue, exchangeRate)}
           </span>
         </div>
@@ -58,13 +58,13 @@ export function V1BalanceHub({ metrics, normalizedPortfolio, accountGroups }) {
         </div>
         
         {/* Reference date */}
-        <p className="text-xs text-gray-600 mt-2">
+        <p className="text-xs text-[var(--text-muted)] mt-2">
           기준일: {new Date(normalizedPortfolio.generated_at).toLocaleDateString('ko-KR')}
         </p>
       </div>
       
       {/* Divider */}
-      <div className="h-px bg-white/5 mb-4" />
+      <div className="h-px bg-[var(--border)] mb-4" />
       
       {/* Account Groups Accordion */}
       <div>
@@ -78,10 +78,10 @@ export function V1BalanceHub({ metrics, normalizedPortfolio, accountGroups }) {
             const isUSD = ['04', '07'].includes(group.code);
             
             return (
-              <div key={group.code} className="rounded-xl overflow-hidden border border-white/5">
+              <div key={group.code} className="rounded-xl overflow-hidden border border-[var(--border)]">
                 {/* Account Header */}
                 <button
-                  className="w-full flex items-center justify-between p-3 hover:bg-white/4 transition-colors"
+                  className="w-full flex items-center justify-between p-3 hover:bg-[var(--bg-card-hover)] transition-colors"
                   onClick={() => toggleAccount(group.code)}
                 >
                   <div className="flex items-center gap-2">
@@ -97,9 +97,9 @@ export function V1BalanceHub({ metrics, normalizedPortfolio, accountGroups }) {
                   
                   <div className="flex items-center gap-3">
                     <div className="text-right">
-                      <p className="text-sm font-semibold text-white">{formatKRW(group.total_value)}</p>
+                      <p className="text-sm font-semibold text-[var(--text-primary)]">{formatKRW(group.total_value)}</p>
                       {isUSD && (
-                        <p className="text-xs text-gray-500">{formatUSD(group.total_value, exchangeRate)}</p>
+                        <p className="text-xs text-[var(--text-muted)]">{formatUSD(group.total_value, exchangeRate)}</p>
                       )}
                     </div>
                     <span className={`text-xs font-semibold px-1.5 py-0.5 rounded-full ${
@@ -108,15 +108,15 @@ export function V1BalanceHub({ metrics, normalizedPortfolio, accountGroups }) {
                       {formatPct(groupReturn)}
                     </span>
                     {isExpanded
-                      ? <ChevronUp size={14} className="text-gray-500" />
-                      : <ChevronDown size={14} className="text-gray-500" />
+                      ? <ChevronUp size={14} className="text-[var(--text-muted)]" />
+                      : <ChevronDown size={14} className="text-[var(--text-muted)]" />
                     }
                   </div>
                 </button>
                 
                 {/* Holdings List */}
                 {isExpanded && (
-                  <div className="bg-black/20 px-3 pb-3 animate-fade-in">
+                  <div className="bg-[var(--bg-secondary)] px-3 pb-3 animate-fade-in">
                     {group.holdings.map(h => {
                       const hReturn = h.cost_krw > 0
                         ? ((h.current_krw - h.cost_krw) / h.cost_krw) * 100
@@ -131,13 +131,13 @@ export function V1BalanceHub({ metrics, normalizedPortfolio, accountGroups }) {
                               style={{ background: assetInfo?.color ?? '#666' }}
                             />
                             <div className="min-w-0">
-                              <p className="text-sm font-medium text-gray-200 truncate">{h.name}</p>
-                              <p className="text-xs text-gray-600">{h.ticker} · {h.qty}주</p>
+                              <p className="text-sm font-medium text-[var(--text-primary)] truncate">{h.name}</p>
+                              <p className="text-xs text-[var(--text-muted)]">{h.ticker} · {h.qty}주</p>
                             </div>
                           </div>
                           
                           <div className="text-right flex-shrink-0 ml-2">
-                            <p className="text-sm font-semibold text-white">
+                            <p className="text-sm font-semibold text-[var(--text-primary)]">
                               {formatKRW(h.total_current_krw)}
                             </p>
                             <p className={`text-xs font-medium ${hReturn >= 0 ? 'text-red-400' : 'text-blue-400'}`}>

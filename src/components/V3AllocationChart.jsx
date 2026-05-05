@@ -24,9 +24,9 @@ function CustomTooltip({ active, payload }) {
   const item = payload[0].payload;
   return (
     <div className="custom-tooltip">
-      <p className="text-sm font-semibold text-white">{item.label}</p>
+      <p className="text-sm font-semibold text-[var(--text-primary)]">{item.label}</p>
       <p className="text-sm text-emerald-400">{item.value.toFixed(1)}%</p>
-      <p className="text-xs text-gray-500">{formatKRW(item.krw)}</p>
+      <p className="text-xs text-[var(--text-muted)]">{formatKRW(item.krw)}</p>
     </div>
   );
 }
@@ -40,8 +40,8 @@ function CustomLegend({ data }) {
             className="w-2.5 h-2.5 rounded-full flex-shrink-0"
             style={{ background: item.color }}
           />
-          <span className="text-xs text-gray-400 truncate">{item.label}</span>
-          <span className="text-xs font-semibold text-white ml-auto">{item.value.toFixed(1)}%</span>
+          <span className="text-xs text-[var(--text-muted)] truncate">{item.label}</span>
+          <span className="text-xs font-semibold text-[var(--text-primary)] ml-auto">{item.value.toFixed(1)}%</span>
         </div>
       ))}
     </div>
@@ -70,7 +70,7 @@ export function V3AllocationChart({ metrics }) {
   if (data.length === 0) {
     return (
       <div className="glass-card p-6 flex items-center justify-center h-64">
-        <p className="text-gray-500 text-sm">자산 배분 데이터가 없어요</p>
+        <p className="text-[var(--text-muted)] text-sm">자산 배분 데이터가 없어요</p>
       </div>
     );
   }
@@ -115,8 +115,8 @@ export function V3AllocationChart({ metrics }) {
         
         {/* Center label */}
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
-          <p className="text-xs text-gray-500 mb-0.5">총 자산</p>
-          <p className="text-base font-bold text-white leading-tight">
+          <p className="text-xs text-[var(--text-muted)] mb-0.5">총 자산</p>
+          <p className="text-base font-bold text-[var(--text-primary)] leading-tight">
             {formatKRW(total_value_krw)}
           </p>
         </div>
