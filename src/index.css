@@ -1,53 +1,67 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
-
+/* ── 디자인 토큰 ─────────────────────────────────────────── */
 :root {
   --emerald: #10b981;
   --emerald-light: #34d399;
   --emerald-dark: #059669;
-  --bg-primary: #0a0a0f;
-  --bg-secondary: #111118;
-  --bg-card: #16161e;
-  --bg-card-hover: #1c1c28;
-  --border: rgba(255, 255, 255, 0.07);
-  --border-hover: rgba(255, 255, 255, 0.15);
+  --bg-primary: #08080f;
+  --bg-secondary: rgba(255,255,255,0.03);
+  --bg-card: rgba(16, 16, 28, 0.68);
+  --bg-card-hover: rgba(24, 24, 40, 0.80);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 255, 255, 0.18);
   --text-primary: #f0f0f5;
-  --text-secondary: #8888aa;
-  --text-muted: #555566;
+  --text-secondary: #9090b0;
+  --text-muted: #50506a;
   --radius: 1rem;
   --radius-lg: 1.25rem;
-  --shadow-card: 0 4px 32px rgba(0, 0, 0, 0.4), 0 1px 0 rgba(255,255,255,0.04) inset;
+  --shadow-card: 0 8px 40px rgba(0,0,0,0.45), 0 1px 0 rgba(255,255,255,0.05) inset;
 }
 
 .light-mode {
-  --bg-primary: #f4f5f8;
-  --bg-secondary: #e9eaef;
-  --bg-card: #ffffff;
-  --bg-card-hover: #fcfcfd;
-  --border: rgba(0, 0, 0, 0.08);
-  --border-hover: rgba(0, 0, 0, 0.15);
-  --text-primary: #1a1a24;
-  --text-secondary: #555566;
-  --text-muted: #8888aa;
-  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.04), 0 1px 0 rgba(0,0,0,0.02) inset;
+  --bg-primary: #eef0f6;
+  --bg-secondary: rgba(0,0,0,0.03);
+  --bg-card: rgba(255, 255, 255, 0.75);
+  --bg-card-hover: rgba(255, 255, 255, 0.90);
+  --border: rgba(0, 0, 0, 0.07);
+  --border-hover: rgba(0, 82, 255, 0.20);
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #9ca3af;
+  --shadow-card: 0 4px 24px rgba(0,0,0,0.07), 0 1px 0 rgba(255,255,255,0.9) inset;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+/* ── 리셋 ─────────────────────────────────────────────────── */
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* ── 글래스모피즘 배경 캔버스 ──────────────────────────────
+   html 에 gradient blobs 고정 → 카드 blur 가 이걸 가져감    */
 html {
   scroll-behavior: smooth;
+  min-height: 100%;
+  background:
+    radial-gradient(ellipse 110% 65% at 8%  5%,  rgba(16,185,129,0.11) 0%, transparent 58%),
+    radial-gradient(ellipse  80% 55% at 92% 90%,  rgba(99,102,241,0.09) 0%, transparent 58%),
+    radial-gradient(ellipse  60% 40% at 55% 50%,  rgba(16,185,129,0.04) 0%, transparent 100%),
+    #08080f;
+  background-attachment: fixed;
+}
+
+html.light-mode {
+  background:
+    radial-gradient(ellipse 110% 65% at 8%  5%,  rgba(16,185,129,0.07) 0%, transparent 58%),
+    radial-gradient(ellipse  80% 55% at 92% 90%,  rgba(99,102,241,0.06) 0%, transparent 58%),
+    #eef0f6;
 }
 
 body {
   font-family: 'Pretendard Variable', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background-color: var(--bg-primary);
+  background: transparent; /* html 배경 표시 */
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -55,43 +69,37 @@ body {
   overflow-x: hidden;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
+/* ── 스크롤바 ─────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.10); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.20); }
 
-/* Glass morphism card */
+/* ── 핵심: 글래스모피즘 카드 ─────────────────────────────── */
 .glass-card {
   background: var(--bg-card);
+  backdrop-filter: blur(22px) saturate(155%);
+  -webkit-backdrop-filter: blur(22px) saturate(155%);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
-  transition: all 0.2s ease;
+  transition: box-shadow 0.22s ease, border-color 0.22s ease, transform 0.18s ease;
 }
 
 .glass-card:hover {
   border-color: var(--border-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(255,255,255,0.06) inset;
+  transform: translateY(-2px);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.52), 0 1px 0 rgba(255,255,255,0.07) inset;
 }
 
-/* Emerald glow */
-.emerald-glow {
-  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+.light-mode .glass-card:hover {
+  box-shadow: 0 8px 32px rgba(0,0,0,0.11), 0 1px 0 rgba(255,255,255,0.95) inset;
 }
 
-/* Gradient text */
+/* ── 에메랄드 글로우 ────────────────────────────────────────── */
+.emerald-glow { box-shadow: 0 0 24px rgba(16,185,129,0.35); }
+
+/* ── 그라디언트 텍스트 ─────────────────────────────────────── */
 .gradient-text {
   background: linear-gradient(135deg, #10b981, #34d399, #6ee7b7);
   -webkit-background-clip: text;
@@ -99,47 +107,28 @@ body {
   background-clip: text;
 }
 
-/* Animations */
+/* ── 애니메이션 ────────────────────────────────────────────── */
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes fadeIn {
   from { opacity: 0; }
-  to { opacity: 1; }
+  to   { opacity: 1; }
 }
-
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
 }
-
 @keyframes pulse-emerald {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
-  50% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+  0%, 100% { box-shadow: 0 0 0 0   rgba(16,185,129,0.4); }
+  50%       { box-shadow: 0 0 0 8px rgba(16,185,129,0);   }
 }
 
-@keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
+.animate-fade-in-up { animation: fadeInUp 0.4s ease forwards; }
+.animate-fade-in    { animation: fadeIn   0.3s ease forwards; }
 
-.animate-fade-in-up {
-  animation: fadeInUp 0.4s ease forwards;
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.3s ease forwards;
-}
-
-/* Skeleton loading */
+/* ── 스켈레톤 ──────────────────────────────────────────────── */
 .skeleton {
   background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-card-hover) 50%, var(--bg-card) 75%);
   background-size: 200% 100%;
@@ -147,151 +136,95 @@ body {
   border-radius: 8px;
 }
 
-/* Tab active indicator */
-.tab-active {
-  position: relative;
-}
-
-.tab-active::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 24px;
-  height: 3px;
-  background: var(--emerald);
-  border-radius: 99px;
-}
-
-/* Donut chart center */
+/* ── 도넛 차트 그림자 ─────────────────────────────────────── */
 .recharts-layer.recharts-pie-sector path {
   filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
 }
 
-/* Tooltip */
+/* ── 글래스 툴팁 ───────────────────────────────────────────── */
 .custom-tooltip {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
+  background: rgba(14, 14, 22, 0.88);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid rgba(255,255,255,0.12);
   border-radius: 12px;
   padding: 10px 14px;
-  backdrop-filter: blur(8px);
-  box-shadow: var(--shadow-card);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
 }
 
-/* Badge */
+.light-mode .custom-tooltip {
+  background: rgba(255,255,255,0.92);
+  border-color: rgba(0,0,0,0.08);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.10);
+}
+
+/* ── EasyGuide 팝업 ───────────────────────────────────────── */
+.easy-guide-popup {
+  position: absolute;
+  z-index: 50;
+  min-width: 240px;
+  background: rgba(12, 12, 22, 0.92);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid rgba(255,255,255,0.13);
+  border-radius: 14px;
+  padding: 12px 16px;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.55);
+  animation: fadeInUp 0.18s ease;
+}
+
+.light-mode .easy-guide-popup {
+  background: rgba(255,255,255,0.94);
+  border-color: rgba(0,0,0,0.09);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+}
+
+/* ── 배지 ──────────────────────────────────────────────────── */
 .badge-emerald {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  border-radius: 999px;
-  padding: 2px 10px;
-  font-size: 0.75rem;
-  font-weight: 600;
+  background: rgba(16,185,129,0.15); color: #34d399;
+  border: 1px solid rgba(16,185,129,0.30);
+  border-radius: 999px; padding: 2px 10px;
+  font-size: 0.75rem; font-weight: 600;
 }
-
 .badge-red {
-  background: rgba(239, 68, 68, 0.15);
-  color: #f87171;
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  border-radius: 999px;
-  padding: 2px 10px;
-  font-size: 0.75rem;
-  font-weight: 600;
+  background: rgba(239,68,68,0.15); color: #f87171;
+  border: 1px solid rgba(239,68,68,0.30);
+  border-radius: 999px; padding: 2px 10px;
+  font-size: 0.75rem; font-weight: 600;
 }
-
 .badge-yellow {
-  background: rgba(234, 179, 8, 0.15);
-  color: #facc15;
-  border: 1px solid rgba(234, 179, 8, 0.3);
-  border-radius: 999px;
-  padding: 2px 10px;
-  font-size: 0.75rem;
-  font-weight: 600;
+  background: rgba(234,179,8,0.15); color: #facc15;
+  border: 1px solid rgba(234,179,8,0.30);
+  border-radius: 999px; padding: 2px 10px;
+  font-size: 0.75rem; font-weight: 600;
 }
-
 .badge-blue {
-  background: rgba(59, 130, 246, 0.15);
-  color: #60a5fa;
-  border: 1px solid rgba(59, 130, 246, 0.3);
-  border-radius: 999px;
-  padding: 2px 10px;
-  font-size: 0.75rem;
-  font-weight: 600;
+  background: rgba(59,130,246,0.15); color: #60a5fa;
+  border: 1px solid rgba(59,130,246,0.30);
+  border-radius: 999px; padding: 2px 10px;
+  font-size: 0.75rem; font-weight: 600;
 }
-
 .badge-purple {
-  background: rgba(168, 85, 247, 0.15);
-  color: #c084fc;
-  border: 1px solid rgba(168, 85, 247, 0.3);
-  border-radius: 999px;
-  padding: 2px 10px;
-  font-size: 0.75rem;
-  font-weight: 600;
+  background: rgba(168,85,247,0.15); color: #c084fc;
+  border: 1px solid rgba(168,85,247,0.30);
+  border-radius: 999px; padding: 2px 10px;
+  font-size: 0.75rem; font-weight: 600;
 }
 
-/* Number counter animation */
-.number-up {
-  color: #ef4444;
-}
+/* ── 숫자 색상 ─────────────────────────────────────────────── */
+.number-up      { color: #ef4444; }
+.number-down    { color: #3b82f6; }
+.number-neutral { color: var(--text-secondary); }
 
-.number-down {
-  color: #3b82f6;
-}
-
-.number-neutral {
-  color: var(--text-secondary);
-}
-
-/* Insight card border colors */
-.insight-danger { border-left: 4px solid #ef4444; }
-.insight-warning { border-left: 4px solid #f59e0b; }
-.insight-success { border-left: 4px solid #10b981; }
-.insight-info { border-left: 4px solid #6b7280; }
-.insight-purple { border-left: 4px solid #a855f7; }
-.insight-concentration { border-left: 4px solid #eab308; }
-
-/* Responsive grid */
-.dashboard-grid {
-  display: grid;
-  gap: 1.25rem;
-}
-
-@media (min-width: 1024px) {
-  .dashboard-grid {
-    grid-template-columns: 380px 1fr;
-  }
-}
-
-/* Persona avatar gradient */
-.avatar-syj {
-  background: linear-gradient(135deg, #f97316, #dc2626);
-}
-.avatar-kjy {
-  background: linear-gradient(135deg, #3b82f6, #6366f1);
-}
-.avatar-hyj {
-  background: linear-gradient(135deg, #10b981, #0891b2);
-}
-
-/* Hover effects for holdings rows */
+/* ── 보유 종목 행 ──────────────────────────────────────────── */
 .holding-row {
   transition: background 0.15s ease;
   border-radius: 12px;
   padding: 10px 12px;
 }
+.holding-row:hover { background: rgba(255,255,255,0.04); }
 
-.holding-row:hover {
-  background: rgba(255,255,255,0.04);
-}
-
-/* Accordion animation */
-.accordion-content {
-  overflow: hidden;
-  transition: max-height 0.35s ease, opacity 0.3s ease;
-}
-
-/* Period selector */
+/* ── 기간 선택 버튼 ────────────────────────────────────────── */
 .period-btn {
   padding: 4px 12px;
   border-radius: 999px;
@@ -303,28 +236,42 @@ body {
   color: var(--text-secondary);
   background: transparent;
 }
-
 .period-btn:hover {
   color: var(--text-primary);
-  background: rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.07);
 }
-
 .period-btn.active {
-  background: rgba(16, 185, 129, 0.15);
+  background: rgba(16,185,129,0.15);
   color: #34d399;
-  border-color: rgba(16, 185, 129, 0.3);
+  border-color: rgba(16,185,129,0.30);
 }
 
-/* Popup tooltip for easy guide */
-.easy-guide-popup {
-  position: absolute;
-  z-index: 50;
-  min-width: 240px;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 12px 16px;
-  box-shadow: var(--shadow-card);
-  backdrop-filter: blur(12px);
-  animation: fadeInUp 0.2s ease;
+/* ── 인사이트 피드 스크롤 ──────────────────────────────────── */
+.scrollbar-thin::-webkit-scrollbar { width: 4px; }
+.scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 999px; }
+.scrollbar-thin::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.18); }
+
+/* ── 인사이트 인서트 색상 (레거시 CSS) ─────────────────────── */
+.insight-danger        { border-left: 4px solid #ef4444; }
+.insight-warning       { border-left: 4px solid #f59e0b; }
+.insight-success       { border-left: 4px solid #10b981; }
+.insight-info          { border-left: 4px solid #6b7280; }
+.insight-purple        { border-left: 4px solid #a855f7; }
+.insight-concentration { border-left: 4px solid #eab308; }
+
+/* ── 탭 활성 인디케이터 ────────────────────────────────────── */
+.tab-active { position: relative; }
+.tab-active::after {
+  content: '';
+  position: absolute; bottom: -2px; left: 50%;
+  transform: translateX(-50%);
+  width: 24px; height: 3px;
+  background: var(--emerald); border-radius: 99px;
 }
+
+/* ── 프로필 카드 아바타 글로우 ─────────────────────────────── */
+.avatar-glow-orange  { box-shadow: 0 0 24px rgba(249,115,22,0.45); }
+.avatar-glow-blue    { box-shadow: 0 0 24px rgba(99,102,241,0.45); }
+.avatar-glow-emerald { box-shadow: 0 0 24px rgba(16,185,129,0.45); }
+.avatar-glow-purple  { box-shadow: 0 0 24px rgba(168,85,247,0.45); }

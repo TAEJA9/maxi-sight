@@ -5,16 +5,16 @@ import { Layers, RefreshCw, Activity, Sun, Moon, User } from 'lucide-react';
 import portfolioData from '../portfolio.json';
 
 // Modules
-import { normalizePortfolio, groupByAccount } from './modules/moduleA.js';
+import { normalizePortfolio, groupByAccount, formatKRW } from './modules/moduleA.js';
 import { calculateMetrics } from './modules/moduleB.js';
-import { generateInsights } from './modules/moduleD.js';
+import { generateInsights, generateInsightsWithAI } from './modules/moduleD.js';
 
 // Components
 import { V1BalanceHub } from './components/V1BalanceHub.jsx';
 import { V2KPICards } from './components/V2KPICards.jsx';
 import { V3AllocationChart } from './components/V3AllocationChart.jsx';
 import { V4Timeline } from './components/V4Timeline.jsx';
-import { V5InsightFeed } from './components/V5InsightFeed.jsx';
+import { V5InsightFeed, V5AIHealth } from './components/V5InsightFeed.jsx';
 
 // Persona holding years (simulated)
 const HOLDING_YEARS = {
@@ -128,46 +128,92 @@ function Header({ personas, activeId, onSelect, onRefresh, isDark, toggleDark, i
   );
 }
 
+// 아바타 글로우 클래스 매핑
+const AVATAR_GLOW = {
+  'MIO-USER-SYJ': 'avatar-glow-orange',
+  'MIO-USER-KJY': 'avatar-glow-blue',
+  'MIO-USER-HYJ': 'avatar-glow-emerald',
+  'MIO-USER-PMS': 'avatar-glow-purple',
+};
+
 /**
- * Persona Info Bar
+ * Persona Info Bar — 글래스모피즘 프로필 카드
  */
 function PersonaInfoBar({ portfolio, metrics }) {
-  const avatarGrad = AVATAR_STYLES[portfolio.portfolio_id] || 'from-gray-400 to-gray-600';
-  
-  const returnColor = metrics.total_return_pct >= 0 ? 'text-red-500' : 'text-blue-500';
-  const returnSign = metrics.total_return_pct > 0 ? '+' : '';
-  
+  const avatarGrad  = AVATAR_STYLES[portfolio.portfolio_id] || 'from-gray-400 to-gray-600';
+  const avatarGlow  = AVATAR_GLOW[portfolio.portfolio_id] || '';
+  const isUp        = metrics.total_return_pct >= 0;
+  const returnColor = isUp ? '#ef4444' : '#3b82f6';
+  const returnSign  = metrics.total_return_pct > 0 ? '+' : '';
+  const gainKRW     = metrics.total_value_krw - metrics.total_cost_krw;
+
   return (
-    <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 animate-fade-in">
-      {/* Primary: Return Rate */}
-      <div>
-        <h2 className="text-sm font-medium text-[var(--text-muted)] mb-1">내 포트폴리오 총 수익률</h2>
-        <div className="flex items-baseline gap-2">
-          <span className={`text-5xl md:text-6xl font-extrabold tracking-tighter ${returnColor}`}>
-            {returnSign}{metrics.total_return_pct.toFixed(2)}%
-          </span>
-          {metrics.flags?.length > 0 && (
-            <span className="badge-yellow text-xs transform -translate-y-2">
-              ⚠ {metrics.flags.length}개 경고
-            </span>
-          )}
-        </div>
-      </div>
-      
-      {/* Secondary: Persona Info */}
-      <div className="flex items-center gap-3 bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl p-3 shadow-sm">
-        <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${avatarGrad} flex items-center justify-center text-white font-bold text-lg shadow-inner`}>
-          {portfolio.owner_name[0]}
-        </div>
+    <div className="glass-card p-5 mb-6 animate-fade-in relative overflow-hidden">
+
+      <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+
+        {/* ── 좌: 핵심 수치 ── */}
         <div>
-          <div className="flex items-center gap-2">
-            <span className="text-base font-bold text-[var(--text-primary)] leading-tight">{portfolio.owner_name}</span>
-            <span className="text-xs text-[var(--text-muted)]">{portfolio.age_group}</span>
+          <p className="text-[11px] text-[var(--text-muted)] tracking-widest uppercase mb-1">
+            총 수익률
+          </p>
+          <div className="flex items-baseline gap-2.5 flex-wrap">
+            <span
+              className="text-4xl md:text-5xl font-extrabold tracking-tighter leading-none"
+              style={{ color: returnColor }}
+            >
+              {returnSign}{metrics.total_return_pct.toFixed(2)}%
+            </span>
+            {metrics.flags?.length > 0 && (
+              <span className="badge-yellow text-xs">⚠ {metrics.flags.length}</span>
+            )}
           </div>
-          <div className="mt-0.5">
-            <span className="text-xs font-medium text-emerald-500">{portfolio.style}</span>
+          <div className="flex items-center gap-2 mt-1.5 text-sm flex-wrap">
+            <span className="font-semibold" style={{ color: returnColor }}>
+              {gainKRW >= 0 ? '+' : ''}{formatKRW(Math.abs(gainKRW))}
+            </span>
+            <span className="text-[var(--text-muted)] opacity-40">·</span>
+            <span className="text-[var(--text-muted)]">
+              총 자산&nbsp;
+              <span className="font-semibold text-[var(--text-secondary)]">
+                {formatKRW(metrics.total_value_krw)}
+              </span>
+            </span>
           </div>
         </div>
+
+        {/* ── 우: 프로필 ── */}
+        <div className="flex items-center gap-4 flex-shrink-0">
+          {/* 텍스트 */}
+          <div className="text-right">
+            <div className="flex items-center justify-end gap-2 mb-1.5">
+              <span className="text-xs text-[var(--text-muted)]">{portfolio.age_group}</span>
+              <span className="text-xl font-extrabold text-[var(--text-primary)] tracking-tight">
+                {portfolio.owner_name}
+              </span>
+            </div>
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold
+                             text-emerald-400 bg-emerald-500/10 border border-emerald-500/20
+                             px-2.5 py-1 rounded-full">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              {portfolio.style}
+            </span>
+          </div>
+
+          {/* 아바타 */}
+          <div className="relative flex-shrink-0">
+            <div
+              className={`w-[72px] h-[72px] rounded-2xl bg-gradient-to-br ${avatarGrad}
+                          flex items-center justify-center text-white font-black text-3xl
+                          shadow-xl ${avatarGlow}`}
+            >
+              {portfolio.owner_name[0]}
+            </div>
+            <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-400
+                            border-2 border-[var(--bg-card)] shadow" />
+          </div>
+        </div>
+
       </div>
     </div>
   );
@@ -184,13 +230,7 @@ export default function App() {
   const [lastRefreshed, setLastRefreshed] = useState(null);
 
   // Theme logic
-  const [isDark, setIsDark] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return window.matchMedia('(prefers-color-scheme: dark)').matches;
-    }
-    return true;
-  });
-
+  const [isDark, setIsDark] = useState(true);
   useEffect(() => {
     if (isDark) {
       document.documentElement.classList.remove('light-mode');
@@ -223,11 +263,22 @@ export default function App() {
     return calculateMetrics(normalized, years);
   }, [normalized, activeId, refreshKey]);
   
-  // Module D: Generate insights
-  const insights = useMemo(
-    () => generateInsights(metrics, normalized),
-    [metrics, normalized]
-  );
+  // Module D: Generate insights (Gemini AI 실호출 — Skills-D §7)
+  const [insights, setInsights] = useState([]);
+  const [isInsightsLoading, setIsInsightsLoading] = useState(false);
+
+  useEffect(() => {
+    setIsInsightsLoading(true);
+    setInsights(generateInsights(metrics, normalized)); // 즉시 룰 기반으로 먼저 표시
+    generateInsightsWithAI(metrics, normalized)
+      .then(cards => {
+        setInsights(cards);
+        setIsInsightsLoading(false);
+      })
+      .catch(() => {
+        setIsInsightsLoading(false);
+      });
+  }, [activeId, refreshKey]);
   
   const handleRefresh = useCallback(() => {
     if (isRefreshing) return;
@@ -244,7 +295,7 @@ export default function App() {
   }, [isRefreshing]);
   
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] transition-colors">
+    <div className="min-h-screen transition-colors">
       {/* Header with persona switcher */}
       <Header
         personas={portfolios}
@@ -261,29 +312,33 @@ export default function App() {
         {/* Persona info bar */}
         <PersonaInfoBar portfolio={normalized} metrics={metrics} />
         
-        {/* Dashboard Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-5">
-          {/* Main Left: V1 + V4 */}
-          <div className="space-y-5">
+        {/* Dashboard: 단일 페이지 3행 레이아웃 */}
+        <div className="space-y-5">
+
+          {/* Row 1: 잔고 허브(V1) + 자산 배분(V3) */}
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-5">
             <V1BalanceHub
               metrics={metrics}
               normalizedPortfolio={normalized}
               accountGroups={accountGroups}
             />
-            
-            <V2KPICards metrics={metrics} />
-            
-            <V4Timeline metrics={metrics} />
-          </div>
-          
-          {/* Main Right: V5 + V3 */}
-          <div className="space-y-5">
-            <V5InsightFeed insights={insights} />
-            
             <V3AllocationChart metrics={metrics} />
           </div>
+
+          {/* Row 2: KPI 카드 — 전체 너비 */}
+          <V2KPICards metrics={metrics} />
+
+          {/* Row 3: 타임라인(V4) + [AI 건강도(V5A) / 인사이트 피드(V5B)] */}
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-5">
+            <V4Timeline metrics={metrics} />
+            <div className="flex flex-col gap-5">
+              <V5AIHealth metrics={metrics} isLoading={isInsightsLoading} />
+              <V5InsightFeed insights={insights} isLoading={isInsightsLoading} />
+            </div>
+          </div>
+
         </div>
-        
+
         {/* Footer */}
         <footer className="mt-12 pb-6 text-center">
           <p className="text-xs text-[var(--text-muted)]">

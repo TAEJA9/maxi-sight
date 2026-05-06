@@ -218,40 +218,53 @@ Correlation(p, q) = Cov(p, q) / (σp × σq)
 
 ## 9. Module B 출력 스키마
 
+```json
 {
-
-"portfolio_id": "string",
-
-"calculated_at": "ISO8601 datetime",
-
-"total_value_krw": 0,
-
-"total_cost_krw": 0,
-
-"total_return_pct": 0.0,
-
-"cagr_pct": 0.0,
-
-"sharpe_ratio": 0.0,
-
-"sortino_ratio": 0.0,
-
-"mdd_pct": 0.0,
-
-"portfolio_beta": 0.0,
-
-"volatility_annualized_pct": 0.0,
-
-"allocation": {
-
-"EQ": 0.0, "EQ-F": 0.0, "ET": 0.0, "ET-F": 0.0,
-
-"BD": 0.0, "CS": 0.0, "CM": 0.0, "CR": 0.0, "SV": 0.0
-
-},
-
-"correlation_matrix": {},
-
-"flags": []
-
+  "portfolio_id": "string",
+  "calculated_at": "ISO8601 datetime",
+  "total_value_krw": 0,
+  "total_cost_krw": 0,
+  "total_return_pct": 0.0,
+  "cagr_pct": 0.0,
+  "cagr_is_simple": false,
+  "sharpe_ratio": 0.0,
+  "sortino_ratio": 0.0,
+  "mdd_pct": 0.0,
+  "portfolio_beta": 0.0,
+  "volatility_annualized_pct": 0.0,
+  "allocation": {
+    "EQ": 0.0, "EQ-F": 0.0, "ET": 0.0, "ET-F": 0.0,
+    "BD": 0.0, "CS": 0.0, "CM": 0.0, "CR": 0.0, "SV": 0.0
+  },
+  "contributions": [
+    {
+      "id": "string",
+      "ticker": "string",
+      "name": "string",
+      "asset_class": "string",
+      "gain_krw": 0,
+      "return_pct": 0.0,
+      "weight_pct": 0.0
+    }
+  ],
+  "timeline": [
+    {
+      "date": "M/D",
+      "fullDate": "YYYY-MM-DD",
+      "portfolio": 0.0,
+      "kospi": 0.0,
+      "sp500": 0.0
+    }
+  ],
+  "correlation_matrix": {},
+  "flags": []
 }
+```
+
+**필드 설명**
+
+| 필드 | 설명 |
+|---|---|
+| `cagr_is_simple` | 보유기간 1년 미만 시 `true` — 단순 수익률로 대체됨을 표시 |
+| `contributions` | 종목별 수익 기여도 배열. `return_pct` 내림차순 정렬. V4 수평 바 차트 데이터 |
+| `timeline` | 252영업일 누적 수익률 시계열. 내 포트폴리오·KOSPI·S&P500 포함. V4 라인 차트 데이터 |

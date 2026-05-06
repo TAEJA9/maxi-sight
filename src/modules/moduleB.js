@@ -5,6 +5,26 @@
 
 import { ASSET_CLASSES } from './moduleA.js';
 
+// ── 시드 기반 PRNG (mulberry32) ───────────────────────────────
+// portfolio_id를 시드로 사용 → 같은 포트폴리오는 항상 동일한 시뮬레이션 결과
+function hashString(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) {
+    h = Math.imul(31, h) + str.charCodeAt(i) | 0;
+  }
+  return Math.abs(h);
+}
+
+function makePRNG(seed) {
+  let s = (seed >>> 0) || 1;
+  return function () {
+    s += 0x6D2B79F5;
+    let t = Math.imul(s ^ s >>> 15, 1 | s);
+    t ^= t + Math.imul(t ^ t >>> 7, 61 | t);
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
 const RISK_FREE_RATE = 0.035; // 3.5% — Korean 3Y Treasury (Skills-B §2)
 const TRADING_DAYS = 250;     // Domestic annualization (Skills-B §5)
 const TRADING_DAYS_CRYPTO = 365; // Crypto 24h (Skills-B §5)
@@ -36,30 +56,27 @@ const TICKER_BETAS = {
  * Used to estimate volatility, MDD, and correlation in absence of API data
  * Skills-B §3, §5, §8
  */
-function generateSimulatedReturns(holding, days = 252) {
+function generateSimulatedReturns(holding, days = 252, rand = Math.random) {
   const { ticker, asset_class, total_cost_krw, total_current_krw } = holding;
   const totalReturn = (total_current_krw - total_cost_krw) / total_cost_krw;
   const dailyMu = Math.log(1 + totalReturn) / days;
-  
-  // Volatility per asset class (annualized estimate)
+
   const annualVol = {
     'EQ':   0.28, 'EQ-F': 0.30, 'ET':   0.22, 'ET-F': 0.20,
     'BD':   0.06, 'CS':   0.00, 'CM':   0.18, 'CR':   0.80,
     'SV':   0.00, 'UN':   0.25, 'AL':   0.20,
   }[asset_class] ?? 0.25;
-  
-  // Extra vol for known volatile tickers
+
   const tickerVolMultiplier = {
     'TQQQ': 3.0, 'TSLA': 1.8, 'SOL': 2.5, 'NVDA': 1.6, 'KORAU': 0.6,
   }[ticker] ?? 1.0;
-  
+
   const dailyVol = (annualVol * tickerVolMultiplier) / Math.sqrt(TRADING_DAYS);
   const returns = [];
-  
+
   for (let i = 0; i < days; i++) {
-    // Box-Muller transform for normal distribution
-    const u1 = Math.random();
-    const u2 = Math.random();
+    const u1 = rand();
+    const u2 = rand();
     const z = Math.sqrt(-2 * Math.log(u1 + 1e-10)) * Math.cos(2 * Math.PI * u2);
     returns.push(dailyMu + dailyVol * z);
   }
@@ -69,21 +86,18 @@ function generateSimulatedReturns(holding, days = 252) {
 /**
  * Calculate portfolio-level daily returns from holdings
  */
-function calcPortfolioReturns(normalizedPortfolio, days = 252) {
+function calcPortfolioReturns(normalizedPortfolio, days = 252, rand = Math.random) {
   const { holdings } = normalizedPortfolio;
   const totalValue = holdings.reduce((s, h) => s + h.total_current_krw, 0);
   if (totalValue === 0) return Array(days).fill(0);
-  
-  // Weight each holding's simulated returns by portfolio weight
+
   const portfolioReturns = Array(days).fill(0);
   holdings.forEach(h => {
     const weight = h.total_current_krw / totalValue;
-    const returns = generateSimulatedReturns(h, days);
-    returns.forEach((r, i) => {
-      portfolioReturns[i] += weight * r;
-    });
+    const returns = generateSimulatedReturns(h, days, rand);
+    returns.forEach((r, i) => { portfolioReturns[i] += weight * r; });
   });
-  
+
   return portfolioReturns;
 }
 
@@ -288,19 +302,18 @@ export function calcHoldingContributions(normalizedPortfolio) {
  * Generate performance timeline data for V4 chart
  * Creates relative return % series vs simulated benchmarks
  */
-export function generateTimeline(normalizedPortfolio, days = 252) {
-  const portfolioReturns = calcPortfolioReturns(normalizedPortfolio, days);
-  
-  // Simulated KOSPI (mild positive trend, ~8% annual)
+export function generateTimeline(normalizedPortfolio, days = 252, rand = Math.random) {
+  const portfolioReturns = calcPortfolioReturns(normalizedPortfolio, days, rand);
+
   const kospiReturns = [];
   const sp500Returns = [];
   for (let i = 0; i < days; i++) {
-    const u1 = Math.random(), u2 = Math.random();
+    const u1 = rand(), u2 = rand();
     const z = Math.sqrt(-2 * Math.log(u1 + 1e-10)) * Math.cos(2 * Math.PI * u2);
-    kospiReturns.push(0.00031 + 0.012 * z);   // ~8% annual, ~19% vol
-    const u3 = Math.random(), u4 = Math.random();
+    kospiReturns.push(0.00031 + 0.012 * z);
+    const u3 = rand(), u4 = rand();
     const z2 = Math.sqrt(-2 * Math.log(u3 + 1e-10)) * Math.cos(2 * Math.PI * u4);
-    sp500Returns.push(0.00045 + 0.010 * z2);  // ~12% annual, ~16% vol
+    sp500Returns.push(0.00045 + 0.010 * z2);
   }
   
   // Build cumulative return series starting from today - days
@@ -339,17 +352,20 @@ export function generateTimeline(normalizedPortfolio, days = 252) {
  */
 export function calculateMetrics(normalizedPortfolio, holdingYears = 1.5) {
   const { holdings } = normalizedPortfolio;
-  
+
+  // portfolio_id 기반 고정 시드 → 새로고침해도 동일한 시뮬레이션 결과
+  const rand = makePRNG(hashString(normalizedPortfolio.portfolio_id ?? 'default'));
+
   const totalCost = holdings.reduce((s, h) => s + h.total_cost_krw, 0);
   const totalValue = holdings.reduce((s, h) => s + h.total_current_krw, 0);
   const totalReturn = totalCost > 0 ? ((totalValue - totalCost) / totalCost) * 100 : 0;
-  
+
   const hasCrypto = holdings.some(h => h.asset_class === 'CR');
-  const portfolioReturns = calcPortfolioReturns(normalizedPortfolio, 252);
-  
+  const portfolioReturns = calcPortfolioReturns(normalizedPortfolio, 252, rand);
+
   const cagrResult = calcCAGR(normalizedPortfolio, holdingYears);
   const cagrPct = cagrResult?.cagr_pct ?? 0;
-  
+
   const volResult = calcVolatility(portfolioReturns, hasCrypto);
   const sharpeResult = calcSharpe(cagrPct, volResult.volatility_annualized_pct);
   const mddResult = calcMDD(portfolioReturns);
@@ -357,7 +373,7 @@ export function calculateMetrics(normalizedPortfolio, holdingYears = 1.5) {
   const sortinoResult = calcSortino(cagrPct, portfolioReturns);
   const allocation = calcAllocation(normalizedPortfolio);
   const contributions = calcHoldingContributions(normalizedPortfolio);
-  const timeline = generateTimeline(normalizedPortfolio, 252);
+  const timeline = generateTimeline(normalizedPortfolio, 252, rand);
   
   const flags = [
     ...(volResult.flag ? [volResult.flag] : []),

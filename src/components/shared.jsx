@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { EASY_GUIDE } from '../modules/moduleE.js';
 import { HelpCircle } from 'lucide-react';
 
@@ -8,44 +9,63 @@ import { HelpCircle } from 'lucide-react';
  */
 export function EasyGuide({ term, className = '' }) {
   const [visible, setVisible] = useState(false);
+  const [popupStyle, setPopupStyle] = useState({});
   const ref = useRef(null);
   const guide = EASY_GUIDE[term];
-  
+
   useEffect(() => {
     const handleClick = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) {
-        setVisible(false);
-      }
+      if (ref.current && !ref.current.contains(e.target)) setVisible(false);
     };
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
-  
+
   if (!guide) return null;
-  
+
+  const POPUP_W = 256;
+
+  const handleShow = () => {
+    if (!ref.current) return;
+    const r = ref.current.getBoundingClientRect();
+    // 위에 공간이 충분하면 위쪽, 아니면 아래쪽
+    const spaceAbove = r.top;
+    const openAbove = spaceAbove > 160;
+    // 오른쪽 화면 밖으로 나가지 않도록 left 조정
+    const left = Math.min(r.left, window.innerWidth - POPUP_W - 12);
+    setPopupStyle(
+      openAbove
+        ? { bottom: window.innerHeight - r.top + 8, left }
+        : { top: r.bottom + 8, left }
+    );
+    setVisible(true);
+  };
+
   return (
     <span
       ref={ref}
       className={`relative inline-flex items-center cursor-pointer ${className}`}
-      onMouseEnter={() => setVisible(true)}
+      onMouseEnter={handleShow}
       onMouseLeave={() => setVisible(false)}
       onClick={() => setVisible(v => !v)}
     >
       <HelpCircle size={13} className="text-[var(--text-muted)] hover:text-emerald-400 transition-colors" />
-      
-      {visible && (
-        <div className="easy-guide-popup bottom-full left-0 mb-2 w-64">
+
+      {visible && createPortal(
+        <div
+          className="easy-guide-popup"
+          style={{ position: 'fixed', zIndex: 9999, width: POPUP_W, ...popupStyle }}
+        >
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xs font-bold text-emerald-400">{guide.term}</span>
-            {guide.alias && (
-              <span className="badge-emerald text-xs">{guide.alias}</span>
-            )}
+            {guide.alias && <span className="badge-emerald text-xs">{guide.alias}</span>}
           </div>
           <p className="text-xs text-[var(--text-primary)] leading-relaxed">{guide.desc}</p>
           {guide.sub && (
             <p className="text-xs text-[var(--text-muted)] mt-1 leading-relaxed">{guide.sub}</p>
           )}
-        </div>
+        </div>,
+        document.body
       )}
     </span>
   );

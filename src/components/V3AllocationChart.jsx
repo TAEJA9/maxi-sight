@@ -1,47 +1,41 @@
 import React, { useState } from 'react';
 import {
-  PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend,
+  PieChart, Pie, Cell, ResponsiveContainer,
 } from 'recharts';
 import { ASSET_CLASSES, formatKRW } from '../modules/moduleA.js';
 import { SectionHeader } from './shared.jsx';
 
+// 글래스모피즘 테마에 어울리는 차분한 파스텔-네온 팔레트
 const ASSET_CLASS_COLORS = {
-  'EQ':   '#3b82f6',
-  'EQ-F': '#6366f1',
-  'ET':   '#10b981',
-  'ET-F': '#059669',
-  'BD':   '#f59e0b',
-  'CS':   '#6b7280',
-  'CM':   '#d97706',
-  'CR':   '#a855f7',
-  'SV':   '#0ea5e9',
-  'AL':   '#f43f5e',
-  'UN':   '#374151',
+  'EQ':   '#60a5fa',  // blue-400
+  'EQ-F': '#a5b4fc',  // indigo-300
+  'ET':   '#34d399',  // emerald-400
+  'ET-F': '#6ee7b7',  // emerald-300
+  'BD':   '#fcd34d',  // amber-300
+  'CS':   '#94a3b8',  // slate-400
+  'CM':   '#fdba74',  // orange-300
+  'CR':   '#c084fc',  // purple-400
+  'SV':   '#7dd3fc',  // sky-300
+  'AL':   '#fda4af',  // rose-300
+  'UN':   '#64748b',  // slate-500
 };
-
-function CustomTooltip({ active, payload }) {
-  if (!active || !payload?.length) return null;
-  const item = payload[0].payload;
-  return (
-    <div className="custom-tooltip">
-      <p className="text-sm font-semibold text-[var(--text-primary)]">{item.label}</p>
-      <p className="text-sm text-emerald-400">{item.value.toFixed(1)}%</p>
-      <p className="text-xs text-[var(--text-muted)]">{formatKRW(item.krw)}</p>
-    </div>
-  );
-}
 
 function CustomLegend({ data }) {
   return (
-    <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-4">
+    <div className="grid grid-cols-2 gap-x-6 gap-y-3 mt-5 pt-4 border-t border-[var(--border)]">
       {data.map(item => (
-        <div key={item.cls} className="flex items-center gap-2">
+        <div key={item.cls} className="flex items-center gap-2.5">
           <div
-            className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+            className="w-3 h-3 rounded-full flex-shrink-0"
             style={{ background: item.color }}
           />
-          <span className="text-xs text-[var(--text-muted)] truncate">{item.label}</span>
-          <span className="text-xs font-semibold text-[var(--text-primary)] ml-auto">{item.value.toFixed(1)}%</span>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between gap-1">
+              <span className="text-sm text-[var(--text-secondary)] truncate">{item.label}</span>
+              <span className="text-sm font-bold text-[var(--text-primary)] flex-shrink-0">{item.value.toFixed(1)}%</span>
+            </div>
+            <p className="text-xs text-[var(--text-muted)]">{formatKRW(item.krw)}</p>
+          </div>
         </div>
       ))}
     </div>
@@ -50,12 +44,11 @@ function CustomLegend({ data }) {
 
 /**
  * V3 — 포트폴리오 배분 차트 (Skills-C §V3)
- * Donut chart with total value in center, asset class legend
+ * Donut chart — hover info shown in center, no floating tooltip
  */
 export function V3AllocationChart({ metrics }) {
   const { allocation, total_value_krw } = metrics;
-  
-  // Build donut data
+
   const data = Object.entries(allocation)
     .filter(([, pct]) => pct > 0)
     .map(([cls, pct]) => ({
@@ -66,7 +59,7 @@ export function V3AllocationChart({ metrics }) {
       krw: (pct / 100) * total_value_krw,
     }))
     .sort((a, b) => b.value - a.value);
-  
+
   if (data.length === 0) {
     return (
       <div className="glass-card p-6 flex items-center justify-center h-64">
@@ -74,24 +67,25 @@ export function V3AllocationChart({ metrics }) {
       </div>
     );
   }
-  
+
   const [activeIdx, setActiveIdx] = useState(null);
-  
+  const activeItem = activeIdx !== null ? data[activeIdx] : null;
+
   return (
     <div className="glass-card p-6 animate-fade-in-up">
       <SectionHeader
         title="자산 배분"
         subtitle="포트폴리오 구성 비율"
       />
-      
-      <div className="relative">
+
+      <div className="relative" onMouseLeave={() => setActiveIdx(null)}>
         <ResponsiveContainer width="100%" height={220}>
-          <PieChart>
+          <PieChart margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
             <Pie
               data={data}
               cx="50%"
               cy="50%"
-              innerRadius={65}
+              innerRadius={68}
               outerRadius={95}
               paddingAngle={2}
               dataKey="value"
@@ -104,24 +98,40 @@ export function V3AllocationChart({ metrics }) {
                 <Cell
                   key={entry.cls}
                   fill={entry.color}
-                  opacity={activeIdx === null || activeIdx === idx ? 1 : 0.4}
+                  opacity={activeIdx === null || activeIdx === idx ? 1 : 0.35}
                   stroke="transparent"
                 />
               ))}
             </Pie>
-            <Tooltip content={<CustomTooltip />} />
           </PieChart>
         </ResponsiveContainer>
-        
-        {/* Center label */}
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
-          <p className="text-xs text-[var(--text-muted)] mb-0.5">총 자산</p>
-          <p className="text-base font-bold text-[var(--text-primary)] leading-tight">
-            {formatKRW(total_value_krw)}
-          </p>
+
+        {/* 중앙 정보 — 호버 시 해당 항목, 평소엔 총 자산 */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          {activeItem ? (
+            <div className="text-center transition-all">
+              <p
+                className="text-xs font-semibold mb-0.5 truncate max-w-[110px]"
+                style={{ color: activeItem.color }}
+              >
+                {activeItem.label}
+              </p>
+              <p className="text-2xl font-extrabold text-[var(--text-primary)] leading-none">
+                {activeItem.value.toFixed(1)}%
+              </p>
+              <p className="text-xs text-[var(--text-muted)] mt-1">{formatKRW(activeItem.krw)}</p>
+            </div>
+          ) : (
+            <div className="text-center">
+              <p className="text-xs text-[var(--text-muted)] mb-0.5">총 자산</p>
+              <p className="text-base font-bold text-[var(--text-primary)] leading-tight">
+                {formatKRW(total_value_krw)}
+              </p>
+            </div>
+          )}
         </div>
       </div>
-      
+
       <CustomLegend data={data} />
     </div>
   );

@@ -250,10 +250,86 @@ export function generateInsights(metrics, normalizedPortfolio) {
     });
   }
   
-  // Add timestamps
+  // Add timestamps — 3초 간격으로 (동시 생성된 카드가 "1시간 전"으로 보이는 버그 방지)
   return insights.map((ins, i) => ({
     ...ins,
-    generated_at: new Date(Date.now() - i * 60000 * 15).toISOString(),
+    generated_at: new Date(Date.now() - i * 3000).toISOString(),
     source: 'Gemini AI',
   }));
+}
+
+// ─── Gemini 실호출 버전 (Skills-D §7) ───────────────────────────────────────
+
+import { callGeminiInsights } from './geminiClient.js';
+
+/** 트리거별 Gemini 프롬프트용 컨텍스트 문자열 */
+function getTriggerContext(card, metrics) {
+  const map = {
+    'D-01': `MDD(최대낙폭) = ${metrics.mdd_pct?.toFixed(1)}%`,
+    'D-02': `자산군 비중 목표 이탈 감지`,
+    'D-03': `Sharpe(투자가성비) = ${metrics.sharpe_ratio?.toFixed(2)}`,
+    'D-04': `단일 종목 비중 과다 감지`,
+    'D-05': `변동성 = ${metrics.volatility_annualized_pct?.toFixed(1)}%`,
+    'D-06': `KOSPI 대비 초과수익 달성`,
+    'D-07': `90일 이상 미매매`,
+    'D-09': `보유 종목 뉴스 부정 감성 감지`,
+    'D-TAX': `ISA/IRP 절세 계좌 활용 중`,
+  };
+  return map[card.trigger_id] ?? card.type;
+}
+
+/**
+ * AI 인사이트 생성 (Gemini 실호출) — Skills-D §7 완전 구현
+ * API 호출 실패 시 generateInsights() 룰 기반 결과로 자동 fallback
+ */
+export async function generateInsightsWithAI(metrics, normalizedPortfolio) {
+  // Step 1: 룰 기반으로 트리거 평가 (어떤 카드를 만들지 결정)
+  const baseCards = generateInsights(metrics, normalizedPortfolio);
+
+  // DEFAULT 카드(트리거 없음)는 AI 불필요
+  const triggered = baseCards.filter(c => c.trigger_id !== 'DEFAULT');
+  if (triggered.length === 0) return baseCards;
+
+  // Step 2: Gemini에 전달할 트리거 목록 구성
+  const triggeredItems = triggered.map(c => ({
+    trigger_id: c.trigger_id,
+    type: c.type,
+    title: c.title,
+    priority: c.priority,
+    context: getTriggerContext(c, metrics),
+  }));
+
+  const metricsSnapshot = {
+    owner_name: normalizedPortfolio.owner_name,
+    style: normalizedPortfolio.style,
+    total_value_krw: metrics.total_value_krw,
+    total_return_pct: metrics.total_return_pct,
+    cagr_pct: metrics.cagr_pct,
+    sharpe_ratio: metrics.sharpe_ratio,
+    mdd_pct: metrics.mdd_pct,
+    volatility_annualized_pct: metrics.volatility_annualized_pct,
+  };
+
+  // Step 3: Gemini API 호출
+  const aiCards = await callGeminiInsights(triggeredItems, metricsSnapshot);
+
+  // Step 4: 실패 시 fallback
+  if (!aiCards) return baseCards;
+
+  // Step 5: AI가 생성한 body를 baseCards에 병합 (icon, color 등은 유지)
+  const aiMap = {};
+  aiCards.forEach(c => { aiMap[c.trigger_id] = c; });
+
+  return baseCards.map((card, i) => {
+    const ai = aiMap[card.trigger_id];
+    if (!ai) return card;
+    return {
+      ...card,
+      title: ai.title || card.title,
+      body: ai.body || card.body,
+      generated_at: new Date(Date.now() - i * 60000 * 15).toISOString(),
+      source: 'Gemini AI',
+      ai_generated: true,
+    };
+  });
 }

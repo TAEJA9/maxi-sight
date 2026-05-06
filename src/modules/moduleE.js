@@ -129,6 +129,36 @@ export const EASY_GUIDE = {
     desc: '내 투자 성과를 비교할 기준 지수',
     sub: '코스피나 S&P 500을 많이 사용해요',
   },
+  '수익성': {
+    term: '수익성',
+    alias: '성장 속도',
+    desc: 'CAGR(연 15% 기준)을 0~100점으로 환산한 성장 점수',
+    sub: '100점이면 연 15% 이상 성장 중이에요',
+  },
+  '효율성': {
+    term: '효율성',
+    alias: '투자 가성비',
+    desc: 'Sharpe Ratio(2.0 기준)를 환산 — 위험 대비 수익이 얼마나 좋은지',
+    sub: '높을수록 같은 위험으로 더 많이 벌고 있어요',
+  },
+  '리스크': {
+    term: '리스크 방어',
+    alias: '하락 방어력',
+    desc: 'MDD(최대 낙폭)를 기준으로 환산 — 가장 많이 떨어졌을 때의 타격',
+    sub: '낮을수록 하락장에서 잘 버텼다는 뜻이에요',
+  },
+  '안정성': {
+    term: '안정성',
+    alias: '가격 진정성',
+    desc: '연환산 변동성(35% 기준) 기반 — 가격이 얼마나 출렁이는지',
+    sub: '높을수록 조용하고 예측 가능하게 움직여요',
+  },
+  '분산도': {
+    term: '분산도',
+    alias: '계란 바구니 수',
+    desc: 'HHI(자산 집중도 지수) 기반 — 자산이 얼마나 고르게 퍼져 있는지',
+    sub: '낮을수록 한 종목에 몰려 있어 위험해요',
+  },
 };
 
 /**
@@ -190,10 +220,10 @@ export function formatInsightTime(isoString) {
  * Insight card border color map (Skills-C §V5)
  */
 export const INSIGHT_COLORS = {
-  danger:        { border: 'border-red-500',    bg: 'bg-red-500/5',    label: 'text-red-400'    },
-  warning:       { border: 'border-orange-500', bg: 'bg-orange-500/5', label: 'text-orange-400' },
-  success:       { border: 'border-emerald-500',bg: 'bg-emerald-500/5',label: 'text-emerald-400'},
-  info:          { border: 'border-gray-600',   bg: 'bg-gray-600/5',   label: 'text-gray-400'   },
-  purple:        { border: 'border-purple-500', bg: 'bg-purple-500/5', label: 'text-purple-400' },
-  concentration: { border: 'border-yellow-500', bg: 'bg-yellow-500/5', label: 'text-yellow-400' },
+  danger:        { accent: 'border-l-red-500',    bg: 'bg-red-500/10',    label: 'text-red-400'    },
+  warning:       { accent: 'border-l-orange-500', bg: 'bg-orange-500/10', label: 'text-orange-400' },
+  success:       { accent: 'border-l-emerald-500',bg: 'bg-emerald-500/10',label: 'text-emerald-400'},
+  info:          { accent: 'border-l-gray-500',   bg: 'bg-gray-500/10',   label: 'text-gray-400'   },
+  purple:        { accent: 'border-l-purple-500', bg: 'bg-purple-500/10', label: 'text-purple-400' },
+  concentration: { accent: 'border-l-yellow-500', bg: 'bg-yellow-500/10', label: 'text-yellow-400' },
 };

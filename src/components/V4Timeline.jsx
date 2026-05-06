@@ -89,8 +89,8 @@ export function V4Timeline({ metrics }) {
           <PeriodSelector periods={PERIODS} active={period} onChange={setPeriod} />
         </div>
         
-        <ResponsiveContainer width="100%" height={200}>
-          <LineChart data={displayData} margin={{ top: 5, right: 5, bottom: 5, left: 0 }}>
+        <ResponsiveContainer width="100%" height={220}>
+          <LineChart data={displayData} margin={{ top: 16, right: 8, bottom: 8, left: 4 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
             <XAxis
               dataKey="date"
@@ -104,7 +104,8 @@ export function V4Timeline({ metrics }) {
               axisLine={false}
               tickLine={false}
               tickFormatter={v => `${v >= 0 ? '+' : ''}${v.toFixed(0)}%`}
-              width={45}
+              width={48}
+              padding={{ top: 12, bottom: 12 }}
             />
             <Tooltip content={<ChartTooltip />} />
             <ReferenceLine y={0} stroke="rgba(255,255,255,0.1)" />
