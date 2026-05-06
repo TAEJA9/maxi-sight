@@ -37,3 +37,6 @@ lerna-debug.log*
 
 # Vite
 *.local
+
+# Git worktrees
+.worktrees
