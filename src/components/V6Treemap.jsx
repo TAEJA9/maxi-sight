@@ -48,7 +48,7 @@ const CustomContent = (props) => {
             y={y + 20} 
             fill="#ffffff" 
             fontSize={13} 
-            fontWeight="bold"
+            fontWeight="500"
             className="drop-shadow-md"
           >
             {name}
@@ -96,13 +96,13 @@ export function V6Treemap({ metrics }) {
   }
 
   return (
-    <div className="glass-card p-4 animate-fade-in-up">
+    <div className="glass-card p-4 animate-fade-in-up h-[440px] flex flex-col">
       <SectionHeader 
         title="종목별 비중 (집중도)" 
         subtitle="개별 자산 합산 및 면적 분석" 
       />
       
-      <div className="w-full h-[320px] mt-2">
+      <div className="w-full flex-1 mt-2">
         <ResponsiveContainer width="100%" height="100%">
           <Treemap
             data={data}

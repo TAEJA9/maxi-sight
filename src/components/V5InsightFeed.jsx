@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer,
 } from 'recharts';
-import { INSIGHT_COLORS, formatInsightTime } from '../modules/moduleE.js';
+import { INSIGHT_COLORS, formatInsightTime, EMPTY_STATE } from '../modules/moduleE.js';
 import { SectionHeader, EasyGuide } from './shared.jsx';
 import { Zap, Brain } from 'lucide-react';
 
@@ -288,7 +288,7 @@ export function V5InsightFeed({ insights, isLoading }) {
         <div className="text-center py-8">
           <div className="text-3xl mb-2">👍</div>
           <p className="text-[var(--text-muted)] text-sm">
-            {filterTab === 'all' ? '현재 특이 신호가 없어요' : '이 카테고리의 인사이트가 없어요'}
+            {filterTab === 'all' ? EMPTY_STATE.NO_INSIGHTS : '이 카테고리의 인사이트가 없어요'}
           </p>
         </div>
       ) : (

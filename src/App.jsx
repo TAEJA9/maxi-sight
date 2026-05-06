@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import { Layers, RefreshCw, Activity, Sun, Moon, User } from 'lucide-react';
+import { Layers, RefreshCw, Activity, Sun, Moon, User, PieChart, Calendar, Lightbulb } from 'lucide-react';
 
 // Raw data
 import portfolioData from '../portfolio.json';
@@ -16,6 +16,7 @@ import { V3AllocationChart } from './components/V3AllocationChart.jsx';
 import { V4Timeline } from './components/V4Timeline.jsx';
 import { V5InsightFeed, V5AIHealth } from './components/V5InsightFeed.jsx';
 import { V6Treemap } from './components/V6Treemap.jsx';
+import { V7DividendCalendar } from './components/V7DividendCalendar.jsx';
 
 // Persona holding years (simulated)
 const HOLDING_YEARS = {
@@ -103,8 +104,8 @@ function Header({ personas, activeId, onSelect, onRefresh, isDark, toggleDark, i
             </div>
           </div>
           
-          {/* Center GNB Tabs */}
-          <div className="flex bg-[var(--bg-secondary)] p-1 rounded-xl flex-shrink-0">
+          {/* Center GNB Tabs (Desktop) */}
+          <div className="hidden md:flex bg-[var(--bg-secondary)] p-1 rounded-xl flex-shrink-0">
             <button
               className={`px-3 md:px-5 py-1.5 rounded-lg text-[13px] md:text-sm font-semibold transition-all ${
                 activeTab === 'overview' 
@@ -127,6 +128,16 @@ function Header({ personas, activeId, onSelect, onRefresh, isDark, toggleDark, i
             </button>
             <button
               className={`px-3 md:px-5 py-1.5 rounded-lg text-[13px] md:text-sm font-semibold transition-all ${
+                activeTab === 'dividend' 
+                  ? 'bg-[var(--bg-card)] text-emerald-500 shadow-sm' 
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+              }`}
+              onClick={() => onTabChange('dividend')}
+            >
+              배당
+            </button>
+            <button
+              className={`px-3 md:px-5 py-1.5 rounded-lg text-[13px] md:text-sm font-semibold transition-all ${
                 activeTab === 'insights' 
                   ? 'bg-[var(--bg-card)] text-emerald-500 shadow-sm' 
                   : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
@@ -141,7 +152,7 @@ function Header({ personas, activeId, onSelect, onRefresh, isDark, toggleDark, i
           <div className="flex items-center justify-end gap-1.5 flex-1 min-w-0">
             <button
               onClick={toggleDark}
-              className="p-2 rounded-xl hover:bg-[var(--bg-card-hover)] text-[var(--text-muted)] hover:text-emerald-400 transition-all hidden sm:block"
+              className="p-2 rounded-xl hover:bg-[var(--bg-card-hover)] text-[var(--text-muted)] hover:text-emerald-400 transition-all block"
               title="테마 변경"
             >
               {isDark ? <Sun size={18} /> : <Moon size={18} />}
@@ -306,16 +317,56 @@ export default function App() {
   useEffect(() => {
     setIsInsightsLoading(true);
     setInsights(generateInsights(metrics, normalized)); // 즉시 룰 기반으로 먼저 표시
-    generateInsightsWithAI(metrics, normalized)
-      .then(cards => {
-        setInsights(cards);
-        setIsInsightsLoading(false);
-      })
-      .catch(() => {
-        setIsInsightsLoading(false);
+    
+    // 이전에 import되었던 generateInsightsWithAI 가 있다면 비동기 호출
+    if (typeof generateInsightsWithAI === 'function') {
+      generateInsightsWithAI(metrics, normalized)
+        .then(cards => {
+          setInsights(cards);
+          setIsInsightsLoading(false);
+        })
+        .catch(() => {
+          setIsInsightsLoading(false);
+        });
+    } else {
+      setIsInsightsLoading(false);
+    }
+  }, [activeId, refreshKey, metrics, normalized]);
+
+  // GNB Scroll Spy Logic
+  useEffect(() => {
+    const observerOptions = {
+      root: null,
+      rootMargin: '-40% 0px -60% 0px', // Trigger when section is near top/middle
+      threshold: 0
+    };
+
+    const observerCallback = (entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+          if (id === 'section-overview') setActiveTab('overview');
+          if (id === 'section-portfolio') setActiveTab('portfolio');
+          if (id === 'section-dividend') setActiveTab('dividend');
+          if (id === 'section-insights') setActiveTab('insights');
+        }
       });
-  }, [activeId, refreshKey]);
-  
+    };
+
+    const observer = new IntersectionObserver(observerCallback, observerOptions);
+    
+    const sections = [
+      document.getElementById('section-overview'),
+      document.getElementById('section-portfolio'),
+      document.getElementById('section-dividend'),
+      document.getElementById('section-insights')
+    ];
+    
+    sections.forEach(sec => sec && observer.observe(sec));
+
+    return () => observer.disconnect();
+  }, [activeId]); // Re-bind observer if needed, though mostly static layout
+
   const scrollToSection = (sectionId) => {
     setActiveTab(sectionId);
     const element = document.getElementById(`section-${sectionId}`);
@@ -346,7 +397,7 @@ export default function App() {
   }, [isRefreshing]);
   
   return (
-    <div className="min-h-screen transition-colors">
+    <div className="min-h-screen transition-colors pb-20 md:pb-0">
       {/* Header with persona switcher */}
       <Header
         personas={portfolios}
@@ -383,10 +434,18 @@ export default function App() {
             <div className="flex items-center gap-2 mb-2">
               <h2 className="text-xl font-bold text-[var(--text-primary)]">포트폴리오 심층 분석</h2>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-4 items-start">
-              <V3AllocationChart metrics={metrics} />
+            <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-4 items-stretch">
+              <V3AllocationChart metrics={metrics} portfolioStyle={normalized.style} />
               <V6Treemap metrics={metrics} />
             </div>
+          </section>
+
+          {/* Section 3: Dividend */}
+          <section id="section-dividend" className="space-y-4 scroll-mt-24">
+            <div className="flex items-center gap-2 mb-2">
+              <h2 className="text-xl font-bold text-[var(--text-primary)]">배당 시뮬레이션</h2>
+            </div>
+            <V7DividendCalendar metrics={metrics} />
           </section>
 
           {/* Section 3: Performance & Insights */}
@@ -418,6 +477,49 @@ export default function App() {
           </p>
         </footer>
       </main>
+
+      {/* Mobile Bottom Navigation */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[var(--bg-primary)]/95 backdrop-blur-xl border-t border-[var(--border)] px-2 py-2 pb-safe">
+        <div className="flex items-center justify-around">
+          <button
+            className={`flex flex-col items-center justify-center w-full py-2 gap-1 rounded-lg transition-colors ${
+              activeTab === 'overview' ? 'text-emerald-500' : 'text-[var(--text-muted)]'
+            }`}
+            onClick={() => scrollToSection('overview')}
+          >
+            <Activity size={20} />
+            <span className="text-[10px] font-bold">오버뷰</span>
+          </button>
+          <button
+            className={`flex flex-col items-center justify-center w-full py-2 gap-1 rounded-lg transition-colors ${
+              activeTab === 'portfolio' ? 'text-emerald-500' : 'text-[var(--text-muted)]'
+            }`}
+            onClick={() => scrollToSection('portfolio')}
+          >
+            <PieChart size={20} />
+            <span className="text-[10px] font-bold">포트폴리오</span>
+          </button>
+          <button
+            className={`flex flex-col items-center justify-center w-full py-2 gap-1 rounded-lg transition-colors ${
+              activeTab === 'dividend' ? 'text-emerald-500' : 'text-[var(--text-muted)]'
+            }`}
+            onClick={() => scrollToSection('dividend')}
+          >
+            <Calendar size={20} />
+            <span className="text-[10px] font-bold">배당</span>
+          </button>
+          <button
+            className={`flex flex-col items-center justify-center w-full py-2 gap-1 rounded-lg transition-colors ${
+              activeTab === 'insights' ? 'text-emerald-500' : 'text-[var(--text-muted)]'
+            }`}
+            onClick={() => scrollToSection('insights')}
+          >
+            <Lightbulb size={20} />
+            <span className="text-[10px] font-bold">인사이트</span>
+          </button>
+        </div>
+      </div>
+
     </div>
   );
 }

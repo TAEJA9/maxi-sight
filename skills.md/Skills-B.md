@@ -216,7 +216,75 @@ Correlation(p, q) = Cov(p, q) / (σp × σq)
 **Module C 연계**: 상관관계 매트릭스는 V3 보조 히트맵(선택적)으로 시각화
 
 
-## 9. Module B 출력 스키마
+## 9. 배당 수익 추정
+
+**정의**: 보유 종목의 `dividend_yield_pct` 필드를 기반으로 연간·월간 예상 배당금 계산
+
+**공식**:
+
+annual_dividend_krw = Σ(종목 평가액 × dividend_yield_pct / 100)
+
+monthly_dividend_krw = annual_dividend_krw / 12
+
+**계산 규칙**:
+
+- `dividend_yield_pct > 0`인 종목만 포함
+- `dividend_items` 배열은 `annual_krw` 내림차순 정렬
+- 가상자산(CR)은 배당 계산 제외
+
+**출력 필드**: `dividend` (object)
+
+```json
+{
+  "annual_dividend_krw": 0,
+  "monthly_dividend_krw": 0,
+  "dividend_items": [
+    { "name": "string", "ticker": "string", "yield_pct": 0.0, "annual_krw": 0, "monthly_krw": 0 }
+  ]
+}
+```
+
+**Module C 연계**: V2 보조 KPI 카드 — 연 배당·월 배당·배당 종목 수로 표시
+
+
+## 10. 종목별 비중 배열 (V6 트리맵용)
+
+**정의**: 전체 보유 종목을 평가액 기준으로 집계한 배열. 계좌가 다르더라도 동일 ticker는 합산.
+
+**계산 규칙**:
+
+- `ticker`가 같은 항목 합산
+- `value` 내림차순 정렬
+- `asset_class` 포함 — V6 색상 매핑에 사용
+
+**출력 필드**: `ticker_allocation` (array)
+
+```json
+[
+  { "name": "string", "ticker": "string", "value": 0, "asset_class": "EQ-F | ..." }
+]
+```
+
+
+## 11. 광역 배분 (국내 / 해외)
+
+**정의**: 보유 자산을 국내와 해외로 이분하여 비중 계산
+
+**분류 기준**:
+
+| 구분 | 자산 클래스 |
+|---|---|
+| 해외 | EQ-F, ET-F, CR, CM |
+| 국내 | EQ, ET, BD, CS, SV, UN |
+
+**출력 필드**: `super_allocation` (object)
+
+```json
+{ "domestic_pct": 0.0, "overseas_pct": 0.0 }
+```
+
+
+## 12. Module B 출력 스키마
 
 ```json
 {
@@ -235,6 +303,15 @@ Correlation(p, q) = Cov(p, q) / (σp × σq)
   "allocation": {
     "EQ": 0.0, "EQ-F": 0.0, "ET": 0.0, "ET-F": 0.0,
     "BD": 0.0, "CS": 0.0, "CM": 0.0, "CR": 0.0, "SV": 0.0
+  },
+  "super_allocation": { "domestic_pct": 0.0, "overseas_pct": 0.0 },
+  "ticker_allocation": [
+    { "name": "string", "ticker": "string", "value": 0, "asset_class": "string" }
+  ],
+  "dividend": {
+    "annual_dividend_krw": 0,
+    "monthly_dividend_krw": 0,
+    "dividend_items": []
   },
   "contributions": [
     {

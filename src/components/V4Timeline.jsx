@@ -65,7 +65,10 @@ export function V4Timeline({ metrics }) {
       <div className="glass-card p-4 animate-fade-in-up">
         <div className="flex items-center justify-between flex-wrap gap-3 mb-5">
           <div>
-            <SectionHeader title="수익률 타임라인" />
+            <SectionHeader 
+              title="수익률 타임라인" 
+              subtitle="현재일 기준 과거 1년 시뮬레이션"
+            />
             <div className="flex items-center gap-4 text-xs mt-1">
               <span className="flex items-center gap-1.5">
                 <span className="w-4 h-0.5 bg-emerald-400 inline-block rounded" />
@@ -89,7 +92,7 @@ export function V4Timeline({ metrics }) {
           <PeriodSelector periods={PERIODS} active={period} onChange={setPeriod} />
         </div>
         
-        <ResponsiveContainer width="100%" height={220}>
+        <ResponsiveContainer width="100%" height={180}>
           <LineChart data={displayData} margin={{ top: 16, right: 8, bottom: 8, left: 4 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
             <XAxis
@@ -146,7 +149,7 @@ export function V4Timeline({ metrics }) {
           subtitle="취득단가 대비 수익률 순"
         />
         
-        <div className="mt-3 flex flex-col gap-1.5">
+        <div className="mt-3 flex flex-col gap-1.5 max-h-[160px] overflow-y-auto pr-2 scrollbar-thin">
           {topHoldings.map((h, idx) => {
             const isPositive = h.return_pct >= 0;
             const colorClass = isPositive ? 'text-red-500' : 'text-blue-500';

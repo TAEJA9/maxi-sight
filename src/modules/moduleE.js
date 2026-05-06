@@ -3,9 +3,19 @@
  * Translates financial metrics into plain Korean for non-expert users
  */
 
+// ── Skills-E §5: 빈 상태(Empty State) 문구 ───────────────────────────────
 /**
- * CAGR translation (Skills-E §1)
+ * 데이터가 없거나 계산 불가 시 표시되는 안내 문구 (Skills-E §5)
  */
+export const EMPTY_STATE = {
+  NO_PORTFOLIO:   '아직 포트폴리오가 없어요. 첫 종목을 추가해 보세요! 🌱',
+  INSUFFICIENT_DATA: '데이터가 쌓이는 중이에요. 조금만 기다려 주세요',
+  NO_INSIGHTS:    '현재 특이 신호가 없어요. 안정적으로 유지되고 있어요 👍',
+  CALC_ERROR:     '일시적인 오류가 발생했어요. 잠시 후 다시 시도해 주세요',
+  API_FAIL:       '데이터를 불러오지 못했어요. 네트워크 상태를 확인해 주세요',
+};
+
+
 export function translateCAGR(cagrPct, isSimple = false) {
   if (isSimple) return '아직 성장 속도를 측정하기엔 기간이 짧아요';
   if (cagrPct == null) return '아직 성장 속도를 측정하기엔 기간이 짧아요';

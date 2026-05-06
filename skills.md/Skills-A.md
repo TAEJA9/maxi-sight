@@ -203,6 +203,8 @@ current_krw = cost_krw + interest_krw
 
 "sub_type": null,
 
+"dividend_yield_pct": 0.0,
+
 "flag": "OK | MISSING_COST | INVALID_QTY | STALE_PRICE"
 
 }

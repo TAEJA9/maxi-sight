@@ -67,10 +67,31 @@ function triggerD02(metrics, ownerStyle) {
 }
 
 /**
- * D-03: Sharpe > 1.5 → 기회 신호
+ * D-03: Sharpe > 1.5 AND 90일 이상 유지 → 기회 신호 (Skills-D §3)
  */
-function triggerD03(metrics) {
+function triggerD03(metrics, normalizedPortfolio) {
   if (!metrics.sharpe_ratio || metrics.sharpe_ratio <= 1.5) return null;
+
+  // 90일 유지 조건: holdings의 purchase_date 또는 generated_at 기준
+  const today = new Date();
+  const hasPurchaseDates = normalizedPortfolio.holdings.some(h => h.purchase_date);
+  let daysSinceStart = 9999; // 기본값: 조건 충족
+  if (hasPurchaseDates) {
+    const dates = normalizedPortfolio.holdings
+      .filter(h => h.purchase_date)
+      .map(h => new Date(h.purchase_date).getTime())
+      .filter(t => !isNaN(t));
+    if (dates.length > 0) {
+      const oldest = Math.min(...dates);
+      daysSinceStart = Math.floor((today.getTime() - oldest) / (1000 * 60 * 60 * 24));
+    }
+  } else {
+    // purchase_date 없으면 generated_at 기준 HOLDING_YEARS 근사 (1.5년 ≈ 548일)
+    const gen = new Date(normalizedPortfolio.generated_at);
+    daysSinceStart = Math.floor((today.getTime() - gen.getTime()) / (1000 * 60 * 60 * 24)) + 548;
+  }
+  if (daysSinceStart < 90) return null;
+
   return {
     trigger_id: 'D-03',
     type: '기회 신호',
@@ -140,14 +161,35 @@ function triggerD06(metrics) {
 }
 
 /**
- * D-07: 장기 미매매 (항상 트리거 — 데이터 기준일로부터 90일 가정)
+ * D-07: 장기 미매매 (90일 이상) → 정보 알림 (Skills-D §5)
+ * purchase_date 기반 마지막 매수일 연산
  */
-function triggerD07() {
+function triggerD07(normalizedPortfolio) {
+  const today = new Date();
+  const holdings = normalizedPortfolio.holdings ?? [];
+
+  // purchase_date가 있는 항목 중 가장 최신
+  const latestPurchase = holdings
+    .filter(h => h.purchase_date)
+    .map(h => new Date(h.purchase_date).getTime())
+    .filter(t => !isNaN(t))
+    .reduce((max, t) => Math.max(max, t), 0);
+
+  let elapsedDays;
+  if (latestPurchase > 0) {
+    elapsedDays = Math.floor((today.getTime() - latestPurchase) / (1000 * 60 * 60 * 24));
+  } else {
+    // purchase_date 데이터 없음 → generated_at 기준 90일 가정
+    elapsedDays = 90;
+  }
+
+  if (elapsedDays < 90) return null;
+
   return {
     trigger_id: 'D-07',
     type: '정보 알림',
     title: '포트폴리오를 점검할 때가 됐어요',
-    body: '정기적인 포트폴리오 점검은 안정적인 투자의 기본이에요. 자산 배분 비율과 수익률을 한번 살펴보는 건 어떨까요?',
+    body: `마지막 매매 후 ${elapsedDays}일이 지났어요. 정기적인 포트폴리오 점검은 안정적인 투자의 기본이에요. 자산 배분 비율과 수익률을 한번 살펴보는 건 어떨까요?`,
     priority: 'LOW',
     icon: '💡',
     color: 'info',
@@ -185,6 +227,34 @@ function triggerD09(metrics, ownerName, holdings) {
 }
 
 /**
+ * D-08: 목표 수익률 달성 → 정보 알림 (Skills-D §5)
+ * MVP v1.0: 대시보드에 목표 수익률 시나리오별 하드코딩
+ *   - 공격 스타일: 목표 30%
+ *   - 안정 스타일: 목표 10%
+ *   - 미국 스타일: 목표 20%
+ *   - 기타: 목표 15%
+ */
+function triggerD08(metrics, normalizedPortfolio) {
+  const style = normalizedPortfolio.style ?? '';
+  let targetReturn = 15; // 기본값
+  if (style.includes('공격')) targetReturn = 30;
+  else if (style.includes('안정')) targetReturn = 10;
+  else if (style.includes('미국')) targetReturn = 20;
+
+  if (metrics.total_return_pct < targetReturn) return null;
+
+  return {
+    trigger_id: 'D-08',
+    type: '정보 알림',
+    title: '목표 수익률에 도달했어요! 🎯',
+    body: `설정 목표 ${targetReturn}%에 도달했어요! 수익 실현, 리밸런싱, 목표 상향 중 어떤 선택지를 고려할지 생각해보세요. 어떤 방향이든 좋은 결정이에요!`,
+    priority: 'MEDIUM',
+    icon: '💡',
+    color: 'success',
+  };
+}
+
+/**
  * Tax optimization insight for 김정연 (ISA/IRP focused)
  */
 function triggerTaxPraise(ownerName, normalizedPortfolio) {
@@ -212,17 +282,18 @@ function triggerTaxPraise(ownerName, normalizedPortfolio) {
 export function generateInsights(metrics, normalizedPortfolio) {
   const ownerName = normalizedPortfolio.owner_name;
   const ownerStyle = normalizedPortfolio.style;
-  
+
   const rawInsights = [
     triggerD01(metrics),
     triggerD02(metrics, ownerStyle),
-    triggerD03(metrics),
+    triggerD03(metrics, normalizedPortfolio),   // Skills-D: 90일 조건 포함
     triggerD04(metrics),
     triggerD05(metrics),
     triggerD06(metrics),
+    triggerD07(normalizedPortfolio),             // Skills-D: 실제 purchase_date 사용
+    triggerD08(metrics, normalizedPortfolio),    // Skills-D: 목표 수익률 달성
     triggerD09(metrics, ownerName, normalizedPortfolio.holdings),
     triggerTaxPraise(ownerName, normalizedPortfolio),
-    triggerD07(), // Always include as background info
   ].filter(Boolean);
   
   // Sort: HIGH first, then MEDIUM, then LOW (Skills-D §6)

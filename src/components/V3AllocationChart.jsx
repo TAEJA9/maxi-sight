@@ -4,6 +4,7 @@ import {
 } from 'recharts';
 import { ASSET_CLASSES, formatKRW } from '../modules/moduleA.js';
 import { SectionHeader } from './shared.jsx';
+import { AlertTriangle } from 'lucide-react';
 
 // 글래스모피즘 테마에 어울리는 차분한 파스텔-네온 팔레트
 const ASSET_CLASS_COLORS = {
@@ -19,6 +20,20 @@ const ASSET_CLASS_COLORS = {
   'AL':   '#fda4af',  // rose-300
   'UN':   '#64748b',  // slate-500
 };
+
+// ── 페르소나 스타일별 기본 목표 배분 (Skills-D §2·D-02) ──────────────────
+const STYLE_TARGET_ALLOCATION = {
+  'aggressive': { 'EQ-F': 40, 'ET-F': 25, 'CR': 20, 'ET': 10, 'CS': 5 },
+  'stable':     { 'EQ': 25, 'ET-F': 20, 'BD': 25, 'CS': 20, 'AL': 10 },
+  'us-stock':   { 'EQ-F': 70, 'ET-F': 20, 'CS': 10 },
+};
+
+function detectStyle(styleStr = '') {
+  if (styleStr.includes('공격')) return 'aggressive';
+  if (styleStr.includes('안정')) return 'stable';
+  if (styleStr.includes('미국')) return 'us-stock';
+  return 'us-stock';
+}
 
 function CustomLegend({ data }) {
   return (
@@ -42,10 +57,95 @@ function CustomLegend({ data }) {
   );
 }
 
+/**
+ * V3 목표 배분 비교 섹션 (Skills-C §V3)
+ * 현재 비중 vs 목표 비중, ±5%p 초과 항목 강조
+ */
+function TargetAllocationCompare({ allocation, style }) {
+  const styleKey = detectStyle(style);
+  const target = STYLE_TARGET_ALLOCATION[styleKey];
+  if (!target) return null;
+
+  const allClasses = [...new Set([...Object.keys(target), ...Object.keys(allocation).filter(k => (allocation[k] ?? 0) > 0)])];
+
+  const rows = allClasses.map(cls => {
+    const current = allocation[cls] ?? 0;
+    const tgt = target[cls] ?? 0;
+    const diff = current - tgt;
+    const isDeviated = Math.abs(diff) > 5;
+    return { cls, current, tgt, diff, isDeviated };
+  }).filter(r => r.current > 0 || r.tgt > 0);
+
+  return (
+    <div className="mt-5 pt-4 border-t border-[var(--border)]">
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-xs font-semibold text-[var(--text-primary)]">목표 배분 비교</span>
+        <span className="text-[10px] text-[var(--text-muted)]">±5%p 초과 시 강조</span>
+      </div>
+      <div className="space-y-2 max-h-[180px] overflow-y-auto pr-2 scrollbar-thin">
+        {rows.map(({ cls, current, tgt, diff, isDeviated }) => {
+          const color = ASSET_CLASS_COLORS[cls] ?? '#888';
+          const label = ASSET_CLASSES[cls]?.label ?? cls;
+          return (
+            <div
+              key={cls}
+              className={`rounded-lg px-3 py-2 transition-all ${
+                isDeviated
+                  ? 'border border-amber-500/40 bg-amber-500/5'
+                  : 'border border-transparent bg-[var(--bg-secondary)]'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-1.5">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-2 h-2 rounded-full" style={{ background: color }} />
+                  <span className="text-xs font-medium text-[var(--text-secondary)]">{label}</span>
+                  {isDeviated && (
+                    <AlertTriangle size={10} className="text-amber-400" />
+                  )}
+                </div>
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="text-[var(--text-muted)]">목표 {tgt}%</span>
+                  <span className={`font-bold ${
+                    diff > 0 ? 'text-red-400' : diff < 0 ? 'text-blue-400' : 'text-[var(--text-muted)]'
+                  }`}>
+                    {diff > 0 ? '+' : ''}{diff.toFixed(1)}%p
+                  </span>
+                </div>
+              </div>
+              {/* 이중 바: 목표(배경) / 현재(전경) */}
+              <div className="relative h-1.5 w-full rounded-full bg-[var(--border)]">
+                {/* 목표 마커 */}
+                <div
+                  className="absolute top-0 h-full w-0.5 rounded-full bg-white/30"
+                  style={{ left: `${Math.min(tgt, 100)}%` }}
+                />
+                {/* 현재 바 */}
+                <div
+                  className="h-full rounded-full transition-all duration-700"
+                  style={{
+                    width: `${Math.min(current, 100)}%`,
+                    background: isDeviated
+                      ? `linear-gradient(90deg, ${color}99, ${color})`
+                      : color,
+                    boxShadow: isDeviated ? `0 0 6px ${color}55` : 'none',
+                  }}
+                />
+              </div>
+              <div className="flex justify-between mt-1">
+                <span className="text-[10px] text-[var(--text-muted)]">현재 {current.toFixed(1)}%</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function SuperAllocationBar({ superAlloc }) {
   const { domestic_pct, overseas_pct } = superAlloc;
   if (domestic_pct === 0 && overseas_pct === 0) return null;
-  
+
   return (
     <div className="mt-6 pt-5 border-t border-[var(--border)]">
       <div className="flex items-center justify-between mb-2">
@@ -60,13 +160,13 @@ function SuperAllocationBar({ superAlloc }) {
         </div>
       </div>
       <div className="flex w-full h-2 rounded-full overflow-hidden bg-[var(--bg-secondary)]">
-        <div 
-          className="h-full bg-blue-500 transition-all duration-500" 
-          style={{ width: `${domestic_pct}%` }} 
+        <div
+          className="h-full bg-blue-500 transition-all duration-500"
+          style={{ width: `${domestic_pct}%` }}
         />
-        <div 
-          className="h-full bg-indigo-500 transition-all duration-500" 
-          style={{ width: `${overseas_pct}%` }} 
+        <div
+          className="h-full bg-indigo-500 transition-all duration-500"
+          style={{ width: `${overseas_pct}%` }}
         />
       </div>
     </div>
@@ -76,8 +176,9 @@ function SuperAllocationBar({ superAlloc }) {
 /**
  * V3 — 포트폴리오 배분 차트 (Skills-C §V3)
  * Donut chart — hover info shown in center, no floating tooltip
+ * + 목표 배분 비교 (Skills-C §V3 요구사항)
  */
-export function V3AllocationChart({ metrics }) {
+export function V3AllocationChart({ metrics, portfolioStyle }) {
   const { allocation, total_value_krw } = metrics;
 
   const data = Object.entries(allocation)
@@ -103,14 +204,15 @@ export function V3AllocationChart({ metrics }) {
   const activeItem = activeIdx !== null ? data[activeIdx] : null;
 
   return (
-    <div className="glass-card p-4 animate-fade-in-up">
+    <div className="glass-card p-4 animate-fade-in-up h-[440px] flex flex-col">
       <SectionHeader
         title="자산 배분"
         subtitle="포트폴리오 구성 비율"
       />
 
-      <div className="relative" onMouseLeave={() => setActiveIdx(null)}>
-        <ResponsiveContainer width="100%" height={220}>
+      <div className="flex-1 overflow-y-auto scrollbar-thin pr-2 mt-1 pb-4">
+        <div className="relative" onMouseLeave={() => setActiveIdx(null)}>
+          <ResponsiveContainer width="100%" height={200}>
           <PieChart margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
             <Pie
               data={data}
@@ -164,10 +266,16 @@ export function V3AllocationChart({ metrics }) {
       </div>
 
       <CustomLegend data={data} />
-      
+
+      {/* 목표 배분 비교 (Skills-C §V3) */}
+      {portfolioStyle && (
+        <TargetAllocationCompare allocation={allocation} style={portfolioStyle} />
+      )}
+
       {metrics.super_allocation && (
         <SuperAllocationBar superAlloc={metrics.super_allocation} />
       )}
+      </div>
     </div>
   );
 }
