@@ -1,5 +1,6 @@
 import React from 'react';
 import { EasyGuide } from './shared.jsx';
+import { formatKRW } from '../modules/moduleA.js';
 import {
   translateCAGR, translateSharpe, translateMDD,
   cagrColorClass, sharpeColorClass, mddColorClass,
@@ -59,7 +60,7 @@ function KPICard({ title, value, unit, colorClass, translation, guideKey, subtit
         borderColor: `${accentColor}28`,
       }}
     >
-      <div className="p-5 flex flex-col gap-2 flex-1">
+      <div className="p-4 flex flex-col gap-2 flex-1">
         {/* 타이틀 */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
@@ -147,12 +148,15 @@ export function V2KPICards({ metrics }) {
     },
   ];
 
+  const { dividend } = metrics;
+  const hasDividend = dividend && dividend.annual_dividend_krw > 0;
+
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {kpis.map(kpi => <KPICard key={kpi.id} {...kpi} />)}
       </div>
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
         <SecondaryKPI label="Sortino"  guideKey="Sortino"
           value={sortino_ratio != null ? sortino_ratio.toFixed(2) : '—'}
           sub="하락장 맷집" />
@@ -162,6 +166,15 @@ export function V2KPICards({ metrics }) {
         <SecondaryKPI label="변동성"   guideKey="변동성"
           value={volatility_annualized_pct != null ? `${volatility_annualized_pct.toFixed(1)}%` : '—'}
           sub="연환산 스트레스" />
+        <SecondaryKPI label="연 배당"
+          value={hasDividend ? formatKRW(dividend.annual_dividend_krw) : '—'}
+          sub="예상 연간 배당" />
+        <SecondaryKPI label="월 배당"
+          value={hasDividend ? formatKRW(dividend.monthly_dividend_krw) : '—'}
+          sub="월평균 수령 예상" />
+        <SecondaryKPI label="배당 종목"
+          value={hasDividend ? `${dividend.dividend_items.length}개` : '—'}
+          sub="배당 지급 종목 수" />
       </div>
     </div>
   );

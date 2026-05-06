@@ -15,6 +15,7 @@ import { V2KPICards } from './components/V2KPICards.jsx';
 import { V3AllocationChart } from './components/V3AllocationChart.jsx';
 import { V4Timeline } from './components/V4Timeline.jsx';
 import { V5InsightFeed, V5AIHealth } from './components/V5InsightFeed.jsx';
+import { V6Treemap } from './components/V6Treemap.jsx';
 
 // Persona holding years (simulated)
 const HOLDING_YEARS = {
@@ -86,27 +87,61 @@ function UserDropdown({ personas, activeId, onSelect }) {
 /**
  * Header component
  */
-function Header({ personas, activeId, onSelect, onRefresh, isDark, toggleDark, isRefreshing }) {
+function Header({ personas, activeId, onSelect, onRefresh, isDark, toggleDark, isRefreshing, activeTab, onTabChange }) {
   return (
     <header className="sticky top-0 z-30 bg-[var(--bg-primary)]/90 backdrop-blur-xl border-b border-[var(--border)] transition-colors">
       <div className="max-w-[1400px] mx-auto px-4 py-3">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center justify-between gap-2 md:gap-4">
           {/* Logo */}
-          <div className="flex items-center gap-2.5 flex-shrink-0">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg">
+          <div className="flex items-center gap-2.5 flex-1 min-w-0">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg flex-shrink-0">
               <Activity size={16} className="text-white" />
             </div>
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-lg font-bold gradient-text tracking-tight">Maxi-Sight</span>
-              <span className="text-xs text-[var(--text-muted)] hidden sm:inline">by MaxItOut</span>
+            <div className="flex items-baseline gap-1.5 truncate">
+              <span className="text-lg font-bold gradient-text tracking-tight truncate">Maxi-Sight</span>
+              <span className="text-xs text-[var(--text-muted)] hidden lg:inline">by MaxItOut</span>
             </div>
           </div>
           
+          {/* Center GNB Tabs */}
+          <div className="flex bg-[var(--bg-secondary)] p-1 rounded-xl flex-shrink-0">
+            <button
+              className={`px-3 md:px-5 py-1.5 rounded-lg text-[13px] md:text-sm font-semibold transition-all ${
+                activeTab === 'overview' 
+                  ? 'bg-[var(--bg-card)] text-emerald-500 shadow-sm' 
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+              }`}
+              onClick={() => onTabChange('overview')}
+            >
+              오버뷰
+            </button>
+            <button
+              className={`px-3 md:px-5 py-1.5 rounded-lg text-[13px] md:text-sm font-semibold transition-all ${
+                activeTab === 'portfolio' 
+                  ? 'bg-[var(--bg-card)] text-emerald-500 shadow-sm' 
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+              }`}
+              onClick={() => onTabChange('portfolio')}
+            >
+              포트폴리오
+            </button>
+            <button
+              className={`px-3 md:px-5 py-1.5 rounded-lg text-[13px] md:text-sm font-semibold transition-all ${
+                activeTab === 'insights' 
+                  ? 'bg-[var(--bg-card)] text-emerald-500 shadow-sm' 
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+              }`}
+              onClick={() => onTabChange('insights')}
+            >
+              인사이트
+            </button>
+          </div>
+          
           {/* Actions */}
-          <div className="flex items-center gap-1.5 flex-shrink-0">
+          <div className="flex items-center justify-end gap-1.5 flex-1 min-w-0">
             <button
               onClick={toggleDark}
-              className="p-2 rounded-xl hover:bg-[var(--bg-card-hover)] text-[var(--text-muted)] hover:text-emerald-400 transition-all"
+              className="p-2 rounded-xl hover:bg-[var(--bg-card-hover)] text-[var(--text-muted)] hover:text-emerald-400 transition-all hidden sm:block"
               title="테마 변경"
             >
               {isDark ? <Sun size={18} /> : <Moon size={18} />}
@@ -119,7 +154,7 @@ function Header({ personas, activeId, onSelect, onRefresh, isDark, toggleDark, i
             >
               <RefreshCw size={18} className={isRefreshing ? "animate-spin text-emerald-400" : ""} />
             </button>
-            <div className="w-px h-4 bg-[var(--border)] mx-2" />
+            <div className="w-px h-4 bg-[var(--border)] mx-1 md:mx-2" />
             <UserDropdown personas={personas} activeId={activeId} onSelect={onSelect} />
           </div>
         </div>
@@ -203,9 +238,9 @@ function PersonaInfoBar({ portfolio, metrics }) {
           {/* 아바타 */}
           <div className="relative flex-shrink-0">
             <div
-              className={`w-[72px] h-[72px] rounded-2xl bg-gradient-to-br ${avatarGrad}
-                          flex items-center justify-center text-white font-black text-3xl
-                          shadow-xl ${avatarGlow}`}
+              className={`w-12 h-12 rounded-xl bg-gradient-to-br ${avatarGrad}
+                          flex items-center justify-center text-white font-black text-xl
+                          shadow-md ${avatarGlow}`}
             >
               {portfolio.owner_name[0]}
             </div>
@@ -225,6 +260,7 @@ function PersonaInfoBar({ portfolio, metrics }) {
 export default function App() {
   const portfolios = portfolioData.portfolios;
   const [activeId, setActiveId] = useState(portfolios[0].portfolio_id);
+  const [activeTab, setActiveTab] = useState('overview');
   const [refreshKey, setRefreshKey] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastRefreshed, setLastRefreshed] = useState(null);
@@ -280,6 +316,21 @@ export default function App() {
       });
   }, [activeId, refreshKey]);
   
+  const scrollToSection = (sectionId) => {
+    setActiveTab(sectionId);
+    const element = document.getElementById(`section-${sectionId}`);
+    if (element) {
+      // scroll to element considering sticky header offset
+      const headerOffset = 80;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   const handleRefresh = useCallback(() => {
     if (isRefreshing) return;
     setIsRefreshing(true);
@@ -305,6 +356,8 @@ export default function App() {
         isDark={isDark}
         toggleDark={() => setIsDark(!isDark)}
         isRefreshing={isRefreshing}
+        activeTab={activeTab}
+        onTabChange={scrollToSection}
       />
       
       {/* Main content */}
@@ -312,30 +365,43 @@ export default function App() {
         {/* Persona info bar */}
         <PersonaInfoBar portfolio={normalized} metrics={metrics} />
         
-        {/* Dashboard: 단일 페이지 3행 레이아웃 */}
-        <div className="space-y-5">
-
-          {/* Row 1: 잔고 허브(V1) + 자산 배분(V3) */}
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-5">
+        {/* Dashboard Content */}
+        <div className="animate-fade-in space-y-8">
+          
+          {/* Section 1: Overview */}
+          <section id="section-overview" className="space-y-4 scroll-mt-24">
             <V1BalanceHub
               metrics={metrics}
               normalizedPortfolio={normalized}
               accountGroups={accountGroups}
             />
-            <V3AllocationChart metrics={metrics} />
-          </div>
+            <V2KPICards metrics={metrics} />
+          </section>
 
-          {/* Row 2: KPI 카드 — 전체 너비 */}
-          <V2KPICards metrics={metrics} />
-
-          {/* Row 3: 타임라인(V4) + [AI 건강도(V5A) / 인사이트 피드(V5B)] */}
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-5">
-            <V4Timeline metrics={metrics} />
-            <div className="flex flex-col gap-5">
-              <V5AIHealth metrics={metrics} isLoading={isInsightsLoading} />
-              <V5InsightFeed insights={insights} isLoading={isInsightsLoading} />
+          {/* Section 2: Portfolio */}
+          <section id="section-portfolio" className="space-y-4 scroll-mt-24">
+            <div className="flex items-center gap-2 mb-2">
+              <h2 className="text-xl font-bold text-[var(--text-primary)]">포트폴리오 심층 분석</h2>
             </div>
-          </div>
+            <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-4 items-start">
+              <V3AllocationChart metrics={metrics} />
+              <V6Treemap metrics={metrics} />
+            </div>
+          </section>
+
+          {/* Section 3: Performance & Insights */}
+          <section id="section-insights" className="space-y-4 scroll-mt-24">
+            <div className="flex items-center gap-2 mb-2">
+              <h2 className="text-xl font-bold text-[var(--text-primary)]">수익률 추이 및 AI 분석</h2>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-4 items-start">
+              <V4Timeline metrics={metrics} />
+              <div className="flex flex-col gap-4">
+                <V5AIHealth metrics={metrics} isLoading={isInsightsLoading} />
+                <V5InsightFeed insights={insights} isLoading={isInsightsLoading} />
+              </div>
+            </div>
+          </section>
 
         </div>
 

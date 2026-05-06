@@ -82,6 +82,7 @@ function normalizeHolding(holding, exchangeRate) {
     maturity_date: holding.maturity_date ?? null,
     sub_type: holding.sub_type ?? null,
     flag: flags.length === 0 ? 'OK' : flags.join(','),
+    dividend_yield_pct: holding.dividend_yield_pct ?? 0,
     // Computed values
     total_cost_krw: costKrw * holding.qty,
     total_current_krw: finalCurrentKrw * holding.qty,
@@ -148,13 +149,8 @@ export function groupByAccount(normalizedPortfolio) {
  * Format KRW amount per Skills-E §4
  */
 export function formatKRW(amount) {
-  if (amount >= 100000000) {
-    return `${(amount / 100000000).toFixed(1)}억원`;
-  }
-  if (amount >= 10000) {
-    return `${Math.round(amount / 10000).toLocaleString('ko-KR')}만원`;
-  }
-  return `${amount.toLocaleString('ko-KR')}원`;
+  if (amount == null || isNaN(amount)) return '—';
+  return `${Math.round(amount).toLocaleString('ko-KR')}원`;
 }
 
 /**

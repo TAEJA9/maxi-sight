@@ -26,7 +26,7 @@ export function V1BalanceHub({ metrics, normalizedPortfolio, accountGroups }) {
   };
   
   return (
-    <div className="glass-card p-6 animate-fade-in-up">
+    <div className="glass-card p-4 animate-fade-in-up">
       {/* Total Value Header */}
       <div className="mb-6">
         <p className="text-xs font-medium text-[var(--text-muted)] mb-1 tracking-wider uppercase">총 자산</p>

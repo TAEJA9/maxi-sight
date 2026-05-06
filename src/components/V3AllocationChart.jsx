@@ -42,6 +42,37 @@ function CustomLegend({ data }) {
   );
 }
 
+function SuperAllocationBar({ superAlloc }) {
+  const { domestic_pct, overseas_pct } = superAlloc;
+  if (domestic_pct === 0 && overseas_pct === 0) return null;
+  
+  return (
+    <div className="mt-6 pt-5 border-t border-[var(--border)]">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-xs font-semibold text-[var(--text-primary)]">지역별 비중</span>
+        <div className="flex gap-3 text-[11px] font-medium text-[var(--text-muted)]">
+          <span className="flex items-center gap-1">
+            <span className="w-2 h-2 rounded-full bg-blue-500" /> 국내 {domestic_pct}%
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="w-2 h-2 rounded-full bg-indigo-500" /> 해외 {overseas_pct}%
+          </span>
+        </div>
+      </div>
+      <div className="flex w-full h-2 rounded-full overflow-hidden bg-[var(--bg-secondary)]">
+        <div 
+          className="h-full bg-blue-500 transition-all duration-500" 
+          style={{ width: `${domestic_pct}%` }} 
+        />
+        <div 
+          className="h-full bg-indigo-500 transition-all duration-500" 
+          style={{ width: `${overseas_pct}%` }} 
+        />
+      </div>
+    </div>
+  );
+}
+
 /**
  * V3 — 포트폴리오 배분 차트 (Skills-C §V3)
  * Donut chart — hover info shown in center, no floating tooltip
@@ -62,7 +93,7 @@ export function V3AllocationChart({ metrics }) {
 
   if (data.length === 0) {
     return (
-      <div className="glass-card p-6 flex items-center justify-center h-64">
+      <div className="glass-card p-4 flex items-center justify-center h-64">
         <p className="text-[var(--text-muted)] text-sm">자산 배분 데이터가 없어요</p>
       </div>
     );
@@ -72,7 +103,7 @@ export function V3AllocationChart({ metrics }) {
   const activeItem = activeIdx !== null ? data[activeIdx] : null;
 
   return (
-    <div className="glass-card p-6 animate-fade-in-up">
+    <div className="glass-card p-4 animate-fade-in-up">
       <SectionHeader
         title="자산 배분"
         subtitle="포트폴리오 구성 비율"
@@ -133,6 +164,10 @@ export function V3AllocationChart({ metrics }) {
       </div>
 
       <CustomLegend data={data} />
+      
+      {metrics.super_allocation && (
+        <SuperAllocationBar superAlloc={metrics.super_allocation} />
+      )}
     </div>
   );
 }

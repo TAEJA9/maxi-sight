@@ -276,6 +276,83 @@ export function calcAllocation(normalizedPortfolio) {
 }
 
 /**
+ * Super Asset allocation (Domestic vs Overseas)
+ */
+export function calcSuperAllocation(normalizedPortfolio) {
+  const { holdings } = normalizedPortfolio;
+  const totalValue = holdings.reduce((s, h) => s + h.total_current_krw, 0);
+  
+  const superAllocation = { domestic: 0, overseas: 0 };
+  const overseasClasses = ['EQ-F', 'ET-F', 'CR', 'CM']; // Commodities usually USD-based
+  
+  holdings.forEach(h => {
+    if (overseasClasses.includes(h.asset_class)) {
+      superAllocation.overseas += h.total_current_krw;
+    } else {
+      superAllocation.domestic += h.total_current_krw;
+    }
+  });
+  
+  return {
+    domestic_pct: totalValue > 0 ? parseFloat(((superAllocation.domestic / totalValue) * 100).toFixed(2)) : 0,
+    overseas_pct: totalValue > 0 ? parseFloat(((superAllocation.overseas / totalValue) * 100).toFixed(2)) : 0,
+  };
+}
+
+/**
+ * Ticker allocation for Treemap
+ */
+export function calcTickerAllocation(normalizedPortfolio) {
+  const { holdings } = normalizedPortfolio;
+  
+  const tickerMap = {};
+  holdings.forEach(h => {
+    const key = h.ticker || 'Cash';
+    if (!tickerMap[key]) {
+      tickerMap[key] = {
+        name: h.name || h.ticker,
+        ticker: key,
+        value: 0,
+        asset_class: h.asset_class,
+      };
+    }
+    tickerMap[key].value += h.total_current_krw;
+  });
+  
+  return Object.values(tickerMap).sort((a, b) => b.value - a.value);
+}
+
+/**
+ * Annual Dividend Estimate (from dividend_yield_pct field)
+ */
+export function calcDividend(normalizedPortfolio) {
+  const { holdings } = normalizedPortfolio;
+  
+  let annual_dividend_krw = 0;
+  const dividend_items = [];
+  
+  holdings.forEach(h => {
+    const yieldPct = h.dividend_yield_pct ?? 0;
+    if (yieldPct <= 0) return;
+    const annual = h.total_current_krw * (yieldPct / 100);
+    annual_dividend_krw += annual;
+    dividend_items.push({
+      name: h.name,
+      ticker: h.ticker,
+      yield_pct: yieldPct,
+      annual_krw: Math.round(annual),
+      monthly_krw: Math.round(annual / 12),
+    });
+  });
+  
+  return {
+    annual_dividend_krw: Math.round(annual_dividend_krw),
+    monthly_dividend_krw: Math.round(annual_dividend_krw / 12),
+    dividend_items: dividend_items.sort((a, b) => b.annual_krw - a.annual_krw),
+  };
+}
+
+/**
  * Per-holding return contribution
  */
 export function calcHoldingContributions(normalizedPortfolio) {
@@ -397,6 +474,9 @@ export function calculateMetrics(normalizedPortfolio, holdingYears = 1.5) {
     portfolio_beta: betaResult.portfolio_beta,
     volatility_annualized_pct: volResult.volatility_annualized_pct,
     allocation,
+    super_allocation: calcSuperAllocation(normalizedPortfolio),
+    ticker_allocation: calcTickerAllocation(normalizedPortfolio),
+    dividend: calcDividend(normalizedPortfolio),
     contributions,
     timeline,
     flags,

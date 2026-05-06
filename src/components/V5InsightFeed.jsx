@@ -96,7 +96,7 @@ export function V5AIHealth({ metrics, isLoading }) {
   if (!health) return null;
 
   return (
-    <div className="glass-card p-5 animate-fade-in-up">
+    <div className="glass-card p-4 animate-fade-in-up">
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
@@ -243,7 +243,7 @@ export function V5InsightFeed({ insights, isLoading }) {
       });
 
   return (
-    <div className="glass-card p-5 animate-fade-in-up">
+    <div className="glass-card p-4 animate-fade-in-up">
       <SectionHeader
         title="인사이트 피드"
         subtitle={`${insights?.length ?? 0}개`}

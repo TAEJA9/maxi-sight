@@ -62,7 +62,7 @@ export function V4Timeline({ metrics }) {
   return (
     <div className="space-y-4">
       {/* Timeline Chart */}
-      <div className="glass-card p-6 animate-fade-in-up">
+      <div className="glass-card p-4 animate-fade-in-up">
         <div className="flex items-center justify-between flex-wrap gap-3 mb-5">
           <div>
             <SectionHeader title="수익률 타임라인" />
@@ -140,7 +140,7 @@ export function V4Timeline({ metrics }) {
       </div>
       
       {/* Holdings Contribution List */}
-      <div className="glass-card p-5 animate-fade-in-up">
+      <div className="glass-card p-4 animate-fade-in-up">
         <SectionHeader
           title="종목별 수익 기여도"
           subtitle="취득단가 대비 수익률 순"
