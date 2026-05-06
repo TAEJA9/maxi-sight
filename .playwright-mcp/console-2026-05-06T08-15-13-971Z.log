@@ -1,0 +1,8 @@
+[     621ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/chunk-BCXODTBQ.js?v=ed44ceef:21548
+[    1010ms] [INFO] [Gemini] API 키 미설정 — 룰 기반 fallback @ http://localhost:5173/src/modules/geminiClient.js:42
+[    1011ms] [INFO] [Gemini] API 키 미설정 — 룰 기반 fallback @ http://localhost:5173/src/modules/geminiClient.js:42
+[  632128ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:5173/@vite/client:559
+[  632138ms] [ERROR] Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED @ http://localhost:5173/:0
+[  770960ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/chunk-BCXODTBQ.js?v=ed44ceef:21548
+[  772053ms] [INFO] [Gemini] API 키 미설정 — 룰 기반 fallback @ http://localhost:5173/src/modules/geminiClient.js:42
+[  772054ms] [INFO] [Gemini] API 키 미설정 — 룰 기반 fallback @ http://localhost:5173/src/modules/geminiClient.js:42

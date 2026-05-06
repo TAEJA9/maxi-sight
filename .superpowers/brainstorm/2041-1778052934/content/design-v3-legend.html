@@ -1,0 +1,150 @@
+<h2>V3 범례 교체 안</h2>
+<p class="subtitle">도넛 차트는 그대로 — 하단 범례만 "현재 vs 목표" 바 비교로 교체</p>
+
+<style>
+.card-mock {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 16px;
+  padding: 20px;
+  max-width: 380px;
+  margin: 0 auto;
+}
+.donut-placeholder {
+  width: 180px; height: 180px;
+  border-radius: 50%;
+  background: conic-gradient(
+    #60a5fa 0% 32%,
+    #6ee7b7 32% 73%,
+    #fcd34d 73% 81%,
+    #c084fc 81% 93%,
+    #94a3b8 93% 100%
+  );
+  margin: 0 auto;
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+}
+.donut-hole {
+  width: 110px; height: 110px;
+  background: #16162a;
+  border-radius: 50%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.divider { height: 1px; background: rgba(255,255,255,0.08); margin: 16px 0; }
+/* 범례 바 */
+.legend-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  border-radius: 8px;
+  font-size: 12px;
+}
+.legend-bar-row.warn { background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.18); padding: 5px 8px; border-radius: 8px; }
+.lb-color { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+.lb-name  { width: 62px; color: #c8c8e0; flex-shrink: 0; font-size: 11px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.lb-track { flex: 1; height: 6px; background: rgba(255,255,255,0.07); border-radius: 99px; position: relative; }
+.lb-current { height: 6px; border-radius: 99px; position: absolute; top: 0; left: 0; }
+.lb-target  { height: 6px; border-radius: 99px; position: absolute; top: 0; left: 0; border: 1.5px dashed; background: transparent; }
+.lb-pct   { width: 30px; text-align: right; font-weight: 700; flex-shrink: 0; font-size: 11px; }
+.lb-diff  { font-size: 10px; flex-shrink: 0; padding: 1px 5px; border-radius: 99px; }
+.diff-warn { background: rgba(239,68,68,0.15); color: #f87171; }
+.diff-ok   { background: rgba(100,100,120,0.2); color: #888; }
+.legend-note { font-size: 10px; color: #555; display: flex; gap: 12px; margin-top: 10px; }
+.legend-note span { display: flex; align-items: center; gap: 4px; }
+</style>
+
+<div class="card-mock">
+  <!-- 섹션 헤더 -->
+  <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px">
+    <span style="font-size:14px;font-weight:600;color:#e8e8ff">자산 배분</span>
+    <span style="font-size:11px;color:#666">포트폴리오 구성 비율</span>
+  </div>
+
+  <!-- 도넛 차트 (그대로 유지) -->
+  <div class="donut-placeholder">
+    <div class="donut-hole">
+      <span style="font-size:10px;color:#666;margin-bottom:2px">총 자산</span>
+      <span style="font-size:13px;font-weight:800;color:#e8e8ff">4,823만원</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- 기존 범례 → 바 비교로 교체 -->
+  <div style="margin-bottom:6px;display:flex;justify-content:space-between;align-items:center">
+    <span style="font-size:11px;font-weight:600;color:#888">현재 비중</span>
+    <span style="font-size:11px;color:#555">점선 = 목표</span>
+  </div>
+
+  <!-- 정상 항목 -->
+  <div class="legend-bar-row">
+    <div class="lb-color" style="background:#60a5fa"></div>
+    <span class="lb-name">국내 주식</span>
+    <div class="lb-track">
+      <div class="lb-current" style="width:32%;background:#60a5fa"></div>
+      <div class="lb-target"  style="width:30%;border-color:#60a5fa88"></div>
+    </div>
+    <span class="lb-pct" style="color:#60a5fa">32%</span>
+    <span class="lb-diff diff-ok">+2</span>
+  </div>
+
+  <!-- 이탈 항목 (경고) -->
+  <div class="legend-bar-row warn">
+    <div class="lb-color" style="background:#6ee7b7"></div>
+    <span class="lb-name">해외 ETF</span>
+    <div class="lb-track">
+      <div class="lb-current" style="width:41%;background:#6ee7b7"></div>
+      <div class="lb-target"  style="width:25%;border-color:#6ee7b788"></div>
+    </div>
+    <span class="lb-pct" style="color:#6ee7b7">41%</span>
+    <span class="lb-diff diff-warn">⚠+16</span>
+  </div>
+
+  <!-- 이탈 항목 (경고) -->
+  <div class="legend-bar-row warn">
+    <div class="lb-color" style="background:#fcd34d"></div>
+    <span class="lb-name">채권</span>
+    <div class="lb-track">
+      <div class="lb-current" style="width:8%;background:#fcd34d"></div>
+      <div class="lb-target"  style="width:20%;border-color:#fcd34d88"></div>
+    </div>
+    <span class="lb-pct" style="color:#fcd34d">8%</span>
+    <span class="lb-diff diff-warn">⚠-12</span>
+  </div>
+
+  <div class="legend-bar-row">
+    <div class="lb-color" style="background:#c084fc"></div>
+    <span class="lb-name">가상자산</span>
+    <div class="lb-track">
+      <div class="lb-current" style="width:12%;background:#c084fc"></div>
+      <div class="lb-target"  style="width:10%;border-color:#c084fc88"></div>
+    </div>
+    <span class="lb-pct" style="color:#c084fc">12%</span>
+    <span class="lb-diff diff-ok">+2</span>
+  </div>
+
+  <div class="legend-bar-row">
+    <div class="lb-color" style="background:#94a3b8"></div>
+    <span class="lb-name">현금/CMA</span>
+    <div class="lb-track">
+      <div class="lb-current" style="width:7%;background:#94a3b8"></div>
+      <div class="lb-target"  style="width:10%;border-color:#94a3b888"></div>
+    </div>
+    <span class="lb-pct" style="color:#94a3b8">7%</span>
+    <span class="lb-diff diff-ok">-3</span>
+  </div>
+
+  <div class="legend-note">
+    <span>
+      <svg width="16" height="6"><line x1="0" y1="3" x2="16" y2="3" stroke="#aaa" stroke-width="1.5" stroke-dasharray="3 2"/></svg>
+      목표 비중
+    </span>
+    <span><span style="color:#f87171">⚠</span> ±5%p 초과 이탈</span>
+  </div>
+</div>
+
+<p style="text-align:center;color:#888;font-size:12px;margin-top:20px">
+  도넛 차트는 그대로, 기존 2열 그리드 범례만 이 형태로 교체됩니다<br>
+  카드 전체 높이 거의 변화 없음
+</p>

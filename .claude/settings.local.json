@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bash *)",
+      "Bash(node -e \"const d=require\\('./portfolio.json'\\); d.portfolios.forEach\\(p=>console.log\\(p.owner_name, p.holdings.length+'개 종목'\\)\\)\")",
+      "Bash(node -e \"const d=JSON.parse\\(require\\('fs'\\).readFileSync\\('./portfolio.json'\\)\\); d.portfolios.forEach\\(p=>console.log\\(p.owner_name, p.holdings.length+'개 종목'\\)\\)\")",
+      "Bash(git worktree *)",
+      "Bash(npm install *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "mcp__plugin_playwright_playwright__browser_navigate",
+      "mcp__plugin_playwright_playwright__browser_take_screenshot",
+      "mcp__plugin_playwright_playwright__browser_evaluate",
+      "Bash(npm run *)",
+      "mcp__plugin_playwright_playwright__browser_click"
+    ]
+  }
+}

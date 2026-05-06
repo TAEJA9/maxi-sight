@@ -1,0 +1,62 @@
+<h2>구현 접근 방식 선택</h2>
+<p class="subtitle">총 9개 항목 구현 — 어떤 순서로 진행할까요?</p>
+
+<style>
+.item-list { display:flex; flex-direction:column; gap:4px; margin-top:8px; }
+.item { display:flex; align-items:center; gap:6px; font-size:12px; color:#c8c8e0; padding:3px 0; }
+.dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+.phase-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; padding:2px 7px; border-radius:99px; margin-bottom:6px; display:inline-block; }
+.phase1 { background:#10b98120; color:#34d399; border:1px solid #10b98140; }
+.phase2 { background:#6366f120; color:#a5b4fc; border:1px solid #6366f140; }
+.phase3 { background:#f59e0b20; color:#fbbf24; border:1px solid #f59e0b40; }
+</style>
+
+<div class="options">
+
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>한 번에 모두 (Big Bang)</h3>
+      <p>9개 항목을 단일 커밋으로 한꺼번에 구현</p>
+      <div class="pros-cons" style="margin-top:10px">
+        <div class="pros"><h4>장점</h4><ul><li>한 번에 완성</li><li>일관성 유지 쉬움</li></ul></div>
+        <div class="cons"><h4>단점</h4><ul><li>중간 문제 시 디버깅 어려움</li><li>리뷰 범위가 너무 큼</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>임팩트 순서 (Impact-first) ⭐ 추천</h3>
+      <p>투자자 눈에 가장 먼저 보이는 것부터 3단계로 나눠 구현</p>
+      <div class="item-list" style="margin-top:10px">
+        <span class="phase-label phase1">1단계 · 핵심 시각</span>
+        <div class="item"><div class="dot" style="background:#34d399"></div>V3 목표 배분 비교 + ±5%p 이탈 강조</div>
+        <div class="item"><div class="dot" style="background:#34d399"></div>V4 종목별 기여도 → 수평 바 차트</div>
+        <span class="phase-label phase2" style="margin-top:6px">2단계 · 데이터 신뢰</span>
+        <div class="item"><div class="dot" style="background:#a5b4fc"></div>V2 뉴스 감성 배지 (Gemini 연동)</div>
+        <div class="item"><div class="dot" style="background:#a5b4fc"></div>상관관계 히트맵 (V3 아래)</div>
+        <div class="item"><div class="dot" style="background:#a5b4fc"></div>V4 툴팁 초과수익 추가</div>
+        <span class="phase-label phase3" style="margin-top:6px">3단계 · 완성도</span>
+        <div class="item"><div class="dot" style="background:#fbbf24"></div>V1 오류 플래그 경고 배너</div>
+        <div class="item"><div class="dot" style="background:#fbbf24"></div>V1 ISA 비과세 한도 잔여</div>
+        <div class="item"><div class="dot" style="background:#fbbf24"></div>스켈레톤 UI 실제 적용</div>
+        <div class="item"><div class="dot" style="background:#fbbf24"></div>V5 HIGH 우선순위 정렬 보장</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>컴포넌트별 (Component-by-component)</h3>
+      <p>V1 → V2 → V3 → V4 → V5 순서로 뷰별 완전 구현</p>
+      <div class="pros-cons" style="margin-top:10px">
+        <div class="pros"><h4>장점</h4><ul><li>뷰별로 완성 확인 가능</li><li>코드 리뷰 명확</li></ul></div>
+        <div class="cons"><h4>단점</h4><ul><li>늦게 임팩트 큰 것 볼 수 있음</li><li>단계별 맥락 전환 비용</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+</div>

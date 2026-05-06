@@ -1,0 +1,99 @@
+<h2>Skills vs 현재 대시보드 — Gap 분석</h2>
+<p class="subtitle">✅ 구현됨 &nbsp;|&nbsp; ⚠️ 부분 구현 &nbsp;|&nbsp; ❌ 미구현</p>
+
+<style>
+.gap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+.gap-section { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; }
+.gap-section h3 { margin: 0 0 14px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: #a0a0c0; }
+.gap-row { display: flex; align-items: flex-start; gap: 8px; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; }
+.gap-row:last-child { border-bottom: none; }
+.tag { font-size: 15px; flex-shrink: 0; width: 20px; }
+.gap-text { flex: 1; color: #c8c8e0; line-height: 1.5; }
+.gap-text strong { color: #e8e8ff; }
+.badge-ok   { display:inline-block; font-size:10px; padding:1px 6px; border-radius:99px; background:#10b98120; color:#34d399; border:1px solid #10b98140; margin-left:4px; }
+.badge-warn { display:inline-block; font-size:10px; padding:1px 6px; border-radius:99px; background:#f59e0b20; color:#fbbf24; border:1px solid #f59e0b40; margin-left:4px; }
+.badge-miss { display:inline-block; font-size:10px; padding:1px 6px; border-radius:99px; background:#ef444420; color:#f87171; border:1px solid #ef444440; margin-left:4px; }
+.summary-bar { display:flex; gap:12px; padding:14px 18px; background:rgba(255,255,255,0.03); border-radius:10px; margin-bottom:20px; }
+.summary-item { flex:1; text-align:center; }
+.summary-num { font-size:28px; font-weight:900; }
+.summary-label { font-size:11px; color:#888; margin-top:2px; }
+.num-ok   { color: #34d399; }
+.num-warn { color: #fbbf24; }
+.num-miss { color: #f87171; }
+</style>
+
+<div class="summary-bar">
+  <div class="summary-item"><div class="summary-num num-ok">14</div><div class="summary-label">✅ 구현됨</div></div>
+  <div class="summary-item"><div class="summary-num num-warn">5</div><div class="summary-label">⚠️ 부분 구현</div></div>
+  <div class="summary-item"><div class="summary-num num-miss">7</div><div class="summary-label">❌ 미구현</div></div>
+</div>
+
+<div class="gap-grid">
+
+  <div class="gap-section">
+    <h3>V1 · 종합 잔고 허브 <span class="badge-warn">Skills-C §V1</span></h3>
+    <div class="gap-row"><span class="tag">✅</span><div class="gap-text"><strong>총 자산 KRW + USD 병렬</strong> 표시</div></div>
+    <div class="gap-row"><span class="tag">✅</span><div class="gap-text"><strong>계좌별 아코디언</strong> 7종 계좌 표시</div></div>
+    <div class="gap-row"><span class="tag">✅</span><div class="gap-text"><strong>과세이연 배지</strong> 🔒 IRP / 연금저축</div></div>
+    <div class="gap-row"><span class="tag">✅</span><div class="gap-text"><strong>24H 배지</strong> 가상자산 계좌</div></div>
+    <div class="gap-row"><span class="tag">❌</span><div class="gap-text"><strong>전일 대비 변동액/변동률</strong> 없음 — 현재는 누적 수익만 표시</div></div>
+    <div class="gap-row"><span class="tag">❌</span><div class="gap-text"><strong>ISA 비과세 한도 잔여</strong> 표기 없음</div></div>
+    <div class="gap-row"><span class="tag">⚠️</span><div class="gap-text"><strong>오류 플래그 경고 배너</strong> — 배지 숫자만, 상단 배너 없음</div></div>
+  </div>
+
+  <div class="gap-section">
+    <h3>V2 · KPI 카드 <span class="badge-ok">Skills-C §V2</span></h3>
+    <div class="gap-row"><span class="tag">✅</span><div class="gap-text"><strong>CAGR / Sharpe / MDD</strong> 3대 지표</div></div>
+    <div class="gap-row"><span class="tag">✅</span><div class="gap-text"><strong>EasyGuide</strong> 팝업 + Module E 번역 문구</div></div>
+    <div class="gap-row"><span class="tag">✅</span><div class="gap-text"><strong>색상 기준</strong> (초록/노랑/빨강) + SVG 점수 아크</div></div>
+    <div class="gap-row"><span class="tag">✅</span><div class="gap-text"><strong>보조 지표</strong> Sortino / Beta / 변동성</div></div>
+    <div class="gap-row"><span class="tag">❌</span><div class="gap-text"><strong>뉴스 감성 배지</strong> — V2 보조로 specs에 명시, 미구현</div></div>
+  </div>
+
+  <div class="gap-section">
+    <h3>V3 · 포트폴리오 배분 <span class="badge-warn">Skills-C §V3</span></h3>
+    <div class="gap-row"><span class="tag">✅</span><div class="gap-text"><strong>도넛 차트</strong> + 중앙 총 자산</div></div>
+    <div class="gap-row"><span class="tag">✅</span><div class="gap-text"><strong>한글 범례</strong> 9개 자산 클래스</div></div>
+    <div class="gap-row"><span class="tag">✅</span><div class="gap-text"><strong>호버 시 자산군 상세</strong> 표시</div></div>
+    <div class="gap-row"><span class="tag">❌</span><div class="gap-text"><strong>목표 배분 비교</strong> — 현재 vs 목표 나란히 없음</div></div>
+    <div class="gap-row"><span class="tag">❌</span><div class="gap-text"><strong>이탈 ±5%p 강조</strong> — 경고 테두리/아이콘 없음</div></div>
+  </div>
+
+  <div class="gap-section">
+    <h3>V4 · 수익률 타임라인 <span class="badge-warn">Skills-C §V4</span></h3>
+    <div class="gap-row"><span class="tag">✅</span><div class="gap-text"><strong>기간 탭</strong> 1M/3M/6M/1Y/전체</div></div>
+    <div class="gap-row"><span class="tag">✅</span><div class="gap-text"><strong>3개 라인</strong> 포트폴리오/KOSPI/S&P500</div></div>
+    <div class="gap-row"><span class="tag">✅</span><div class="gap-text"><strong>툴팁</strong> 호버 시 수치 표시</div></div>
+    <div class="gap-row"><span class="tag">⚠️</span><div class="gap-text"><strong>종목별 기여도</strong> — skills에서 <em>수평 바 차트</em> 요구, 현재 텍스트 리스트</div></div>
+    <div class="gap-row"><span class="tag">⚠️</span><div class="gap-text"><strong>벤치마크 초과수익</strong> 툴팁에 없음</div></div>
+  </div>
+
+  <div class="gap-section">
+    <h3>V5 · AI 인사이트 + 건강도 <span class="badge-ok">Skills-C §V5</span></h3>
+    <div class="gap-row"><span class="tag">✅</span><div class="gap-text"><strong>트리거 D-01~D-07, D-09</strong> 구현</div></div>
+    <div class="gap-row"><span class="tag">✅</span><div class="gap-text"><strong>유형별 색상/아이콘</strong> 필터 탭</div></div>
+    <div class="gap-row"><span class="tag">✅</span><div class="gap-text"><strong>건강도 레이더</strong> 5개 차원 + 반원 게이지</div></div>
+    <div class="gap-row"><span class="tag">⚠️</span><div class="gap-text"><strong>우선순위 정렬</strong> HIGH 고정 표시 미확인</div></div>
+    <div class="gap-row"><span class="tag">❌</span><div class="gap-text"><strong>D-08 목표 수익률</strong> — 설정 UI 없어 미구현(MVP 명시)</div></div>
+  </div>
+
+  <div class="gap-section">
+    <h3>공통 스타일 + 기타 <span class="badge-warn">Skills-C §4,5</span></h3>
+    <div class="gap-row"><span class="tag">✅</span><div class="gap-text"><strong>애니메이션</strong> fade-in 페이드인 구현</div></div>
+    <div class="gap-row"><span class="tag">✅</span><div class="gap-text"><strong>SkeletonCard</strong> 컴포넌트 존재 (shared.jsx)</div></div>
+    <div class="gap-row"><span class="tag">⚠️</span><div class="gap-text"><strong>스켈레톤 UI</strong> — 컴포넌트 있으나 실제 로딩 시 미사용</div></div>
+    <div class="gap-row"><span class="tag">⚠️</span><div class="gap-text"><strong>Pretendard 폰트</strong> — CSS 적용 여부 미확인</div></div>
+    <div class="gap-row"><span class="tag">❌</span><div class="gap-text"><strong>상관관계 히트맵</strong> — 선택적이나 미구현</div></div>
+  </div>
+
+</div>
+
+<div style="margin-top:24px; padding:16px; background:rgba(99,102,241,0.08); border:1px solid rgba(99,102,241,0.2); border-radius:12px;">
+  <p style="font-size:13px; color:#a5b4fc; margin:0 0 8px; font-weight:700;">🔍 투자자 관점 핵심 UX 이슈 (skills 외)</p>
+  <ul style="margin:0; padding-left:18px; color:#c8c8e0; font-size:13px; line-height:2;">
+    <li><strong>PersonaInfoBar와 V1</strong> 모두 총 자산 표시 → 정보 중복</li>
+    <li><strong>전일 대비 변동</strong> 없어서 당일 손익을 한눈에 알 수 없음</li>
+    <li><strong>V3 목표 배분 없음</strong> → 리밸런싱 판단 불가</li>
+    <li><strong>V4 기여도 리스트</strong>가 바 없이 텍스트만 → 크기 비교 어려움</li>
+  </ul>
+</div>

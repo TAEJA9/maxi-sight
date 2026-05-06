@@ -1,0 +1,3 @@
+[    1672ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5174/node_modules/.vite/deps/chunk-BCXODTBQ.js?v=c8139f93:21548
+[    2155ms] [INFO] [Gemini] API 키 미설정 — 룰 기반 fallback @ http://localhost:5174/src/modules/geminiClient.js:46
+[    2157ms] [INFO] [Gemini] API 키 미설정 — 룰 기반 fallback @ http://localhost:5174/src/modules/geminiClient.js:46

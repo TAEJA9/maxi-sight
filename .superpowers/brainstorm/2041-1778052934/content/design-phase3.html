@@ -1,0 +1,169 @@
+<h2>3단계 설계 — 완성도</h2>
+<p class="subtitle">오류 배너 / ISA 비과세 잔여 / 스켈레톤 UI / V5 우선순위 정렬</p>
+
+<style>
+.section { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.10); border-radius:14px; padding:20px; margin-bottom:18px; }
+.section h3 { margin:0 0 4px; font-size:14px; color:#e8e8ff; }
+.section .sub { font-size:12px; color:#666; margin-bottom:14px; }
+
+/* 오류 배너 */
+.error-banner {
+  display:flex; align-items:center; gap:10px;
+  background:rgba(245,158,11,0.10); border:1px solid rgba(245,158,11,0.30);
+  border-radius:10px; padding:10px 14px; font-size:12px;
+}
+.error-banner .icon { font-size:16px; flex-shrink:0; }
+.error-banner .text { flex:1; color:#fbbf24; }
+.error-banner .text strong { font-weight:700; }
+.error-banner .text span { color:#888; font-size:11px; margin-left:6px; }
+.error-banner .dismiss { font-size:11px; color:#555; cursor:pointer; flex-shrink:0; padding:2px 6px; border:1px solid #333; border-radius:6px; }
+
+/* ISA */
+.account-row { display:flex; align-items:center; justify-content:space-between; padding:8px 10px; background:rgba(255,255,255,0.04); border-radius:8px; font-size:12px; }
+.isa-limit { display:flex; align-items:center; gap:6px; margin-top:8px; padding:7px 10px; background:rgba(16,185,129,0.07); border:1px solid rgba(16,185,129,0.2); border-radius:8px; font-size:11px; }
+.isa-bar-track { flex:1; height:5px; background:rgba(255,255,255,0.07); border-radius:99px; overflow:hidden; }
+.isa-bar-fill  { height:5px; background:linear-gradient(90deg,#10b981,#34d399); border-radius:99px; }
+
+/* 스켈레톤 */
+.skel-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+.skel-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:14px; }
+.skel-line { border-radius:4px; background:linear-gradient(90deg,rgba(255,255,255,0.06) 25%,rgba(255,255,255,0.10) 50%,rgba(255,255,255,0.06) 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; }
+@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+/* V5 정렬 */
+.insight-card { border-radius:10px; border-left:4px solid; padding:10px 12px; margin-bottom:8px; font-size:12px; }
+.ic-high   { border-color:#ef4444; background:rgba(239,68,68,0.07); }
+.ic-medium { border-color:#f59e0b; background:rgba(245,158,11,0.07); }
+.ic-low    { border-color:#6b7280; background:rgba(107,114,128,0.07); }
+.ic-top    { display:flex; align-items:center; gap:6px; margin-bottom:4px; }
+.priority-badge { font-size:9px; font-weight:700; padding:1px 5px; border-radius:99px; }
+.pb-high   { background:rgba(239,68,68,0.2); color:#f87171; }
+.pb-medium { background:rgba(245,158,11,0.2); color:#fbbf24; }
+.pb-low    { background:rgba(107,114,128,0.2); color:#9ca3af; }
+.pin-icon  { font-size:9px; color:#ef4444; }
+</style>
+
+<!-- V1 오류 플래그 배너 -->
+<div class="section">
+  <h3>V1 · 오류 플래그 경고 배너</h3>
+  <div class="sub">Skills-A §4 — 플래그 있는 항목은 대시보드 상단에 배너로 표시, PersonaInfoBar 아래 삽입</div>
+
+  <div class="error-banner">
+    <span class="icon">⚠️</span>
+    <div class="text">
+      <strong>2개 항목에 데이터 경고가 있어요</strong>
+      <span>TIGER 2차전지 (취득단가 없음) · SOL (시세 지연)</span>
+    </div>
+    <span class="dismiss">닫기</span>
+  </div>
+
+  <p style="font-size:11px;color:#555;margin-top:10px">
+    플래그 종류별 문구: MISSING_COST → "취득단가 없음" / STALE_PRICE → "시세 지연" / INVALID_QTY → "수량 오류"<br>
+    닫기 버튼으로 세션 중 숨김 가능 · 플래그 없으면 배너 미표시
+  </p>
+</div>
+
+<!-- V1 ISA 비과세 한도 -->
+<div class="section">
+  <h3>V1 · ISA 비과세 한도 잔여 표기</h3>
+  <div class="sub">ISA 계좌(01) 아코디언 헤더 아래에 한도 잔여 표시 — 비과세 한도 200만원 기준</div>
+
+  <div class="account-row">
+    <div style="display:flex;align-items:center;gap:6px">
+      <span style="font-size:10px;background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:4px;color:#888">01</span>
+      <span style="color:#e8e8ff;font-size:13px;font-weight:600">ISA</span>
+      <span style="font-size:10px;color:#6366f1;background:rgba(99,102,241,0.12);padding:1px 6px;border-radius:99px;border:1px solid rgba(99,102,241,0.25)">🔒 과세이연</span>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:13px;font-weight:700;color:#e8e8ff">820만원</div>
+      <div style="font-size:11px;color:#f87171">+12.4%</div>
+    </div>
+  </div>
+
+  <!-- ISA 비과세 한도 잔여 (아코디언 펼쳐진 상태 상단) -->
+  <div class="isa-limit" style="margin-top:8px">
+    <span style="color:#34d399;font-weight:700">비과세 잔여</span>
+    <div class="isa-bar-track">
+      <div class="isa-bar-fill" style="width:62%"></div>
+    </div>
+    <span style="color:#34d399;font-weight:700;font-size:12px">124만원</span>
+    <span style="color:#555">/ 200만원</span>
+  </div>
+
+  <p style="font-size:11px;color:#555;margin-top:10px">
+    ISA 계좌가 있을 때만 표시 · 이자·배당 수익에서 누적 사용액 차감<br>
+    잔여 0원 이하 시 "⚠ 한도 초과" 배지로 전환
+  </p>
+</div>
+
+<!-- 스켈레톤 UI -->
+<div class="section">
+  <h3>스켈레톤 UI 실제 적용</h3>
+  <div class="sub">SkeletonCard 컴포넌트는 이미 있음 — App.jsx에서 로딩 중일 때 각 뷰에 실제 적용</div>
+
+  <div class="skel-grid">
+    <div class="skel-card">
+      <div class="skel-line" style="height:10px;width:50%;margin-bottom:10px"></div>
+      <div class="skel-line" style="height:28px;width:75%;margin-bottom:8px"></div>
+      <div class="skel-line" style="height:8px;width:90%"></div>
+    </div>
+    <div class="skel-card">
+      <div class="skel-line" style="height:10px;width:50%;margin-bottom:10px"></div>
+      <div class="skel-line" style="height:28px;width:75%;margin-bottom:8px"></div>
+      <div class="skel-line" style="height:8px;width:90%"></div>
+    </div>
+    <div class="skel-card">
+      <div class="skel-line" style="height:10px;width:50%;margin-bottom:10px"></div>
+      <div class="skel-line" style="height:28px;width:75%;margin-bottom:8px"></div>
+      <div class="skel-line" style="height:8px;width:90%"></div>
+    </div>
+  </div>
+
+  <p style="font-size:11px;color:#555;margin-top:10px">
+    적용 위치: V2 KPI 초기 로딩 / V5 인사이트 피드 AI 분석 대기 중<br>
+    현재 V5는 "분석 중..." 텍스트만 — 카드 형태 스켈레톤으로 교체
+  </p>
+</div>
+
+<!-- V5 HIGH 우선순위 정렬 -->
+<div class="section">
+  <h3>V5 · HIGH 우선순위 최상단 고정</h3>
+  <div class="sub">Skills-D §6 — HIGH → MEDIUM → LOW 순서 보장, HIGH 카드 📌 핀 아이콘 추가</div>
+
+  <div class="insight-card ic-high">
+    <div class="ic-top">
+      <span>⚠️</span>
+      <span style="color:#e8e8ff;font-weight:700;font-size:13px">방어벽 점검이 필요해요</span>
+      <span class="priority-badge pb-high">긴급</span>
+      <span class="pin-icon">📌 고정</span>
+    </div>
+    <div style="color:#bbb;font-size:11px">MDD가 14.2%로 임계값을 넘었어요. 채권 비중을 늘리는 게 도움이 될 수 있어요.</div>
+  </div>
+
+  <div class="insight-card ic-medium">
+    <div class="ic-top">
+      <span>🔄</span>
+      <span style="color:#e8e8ff;font-weight:700;font-size:13px">포트폴리오 정리정돈이 필요해요</span>
+      <span class="priority-badge pb-medium">주의</span>
+    </div>
+    <div style="color:#bbb;font-size:11px">해외 ETF 비중이 목표보다 16%p 높아요.</div>
+  </div>
+
+  <div class="insight-card ic-low">
+    <div class="ic-top">
+      <span>💡</span>
+      <span style="color:#e8e8ff;font-weight:700;font-size:13px">포트폴리오를 점검할 때가 됐어요</span>
+      <span class="priority-badge pb-low">참고</span>
+    </div>
+    <div style="color:#bbb;font-size:11px">마지막 매매 후 95일이 지났어요.</div>
+  </div>
+
+  <p style="font-size:11px;color:#555;margin-top:4px">
+    moduleD.js sort 로직 보강 — HIGH는 항상 상단 고정 + 📌 아이콘<br>
+    동일 우선순위 내에서는 generated_at 최신순 정렬
+  </p>
+</div>
+
+<p style="text-align:center;color:#888;font-size:12px">
+  3단계까지 모두 OK면 설계 문서 작성 후 구현 계획으로 넘어갈게요
+</p>
